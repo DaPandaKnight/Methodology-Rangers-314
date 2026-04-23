@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentMatch — Candidate Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F4F1EC; --bg-card: #FDFCFA; --ink: #1A1A18; --ink-soft: #5C5C54;
+      --ink-muted: #9C9C90; --accent: #2B5CE6; --accent-bg: #EEF2FD;
+      --border: rgba(26,26,24,0.1); --border-md: rgba(26,26,24,0.18);
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,241,236,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px;
+    }
+    .nav-logo { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); text-decoration: none; }
+    .nav-logo span { color: var(--accent); }
+    .back-link { font-size: 14px; color: var(--ink-soft); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .back-link:hover { color: var(--ink); }
+    .placeholder {
+      max-width: 600px; margin: 120px auto; text-align: center; padding: 0 2rem;
+    }
+    .placeholder-icon {
+      width: 80px; height: 80px; border-radius: 20px; background: var(--accent-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin: 0 auto 28px;
+    }
+    .placeholder h1 {
+      font-family: 'DM Serif Display', serif; font-size: 32px;
+      letter-spacing: -0.02em; margin-bottom: 14px;
+    }
+    .placeholder p { color: var(--ink-soft); font-size: 15px; line-height: 1.7; margin-bottom: 32px; }
+    .iteration-badge {
+      display: inline-block; font-size: 12px; font-weight: 500;
+      background: var(--accent-bg); color: var(--accent);
+      padding: 6px 16px; border-radius: 20px; letter-spacing: 0.04em;
+    }
+    .features {
+      margin-top: 40px; text-align: left;
+      background: var(--bg-card); border: 1px solid var(--border-md);
+      border-radius: 12px; padding: 24px;
+    }
+    .features h3 { font-size: 13px; font-weight: 500; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    .feature-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--ink-soft);
+    }
+    .feature-item:last-child { border-bottom: none; }
+    .feature-item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-md); flex-shrink: 0; }
+    .feature-item.done .dot { background: #1A7F5A; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+    <a href="index.html" class="back-link">← Back to home</a>
+  </nav>
+
+  <div class="placeholder">
+    <div class="placeholder-icon">🎓</div>
+    <h1>Candidate Portal</h1>
+    <p>Profile creation, job search, and personalised recommendations are being built across Iterations 1–4. Check back soon.</p>
+    <span class="iteration-badge">Coming in Iteration 1 & 2</span>
+
+    <div class="features">
+      <h3>Planned features</h3>
+      <div class="feature-item"><span class="dot"></span>Create candidate profile (name, education, skills, experience)</div>
+      <div class="feature-item"><span class="dot"></span>Upload resume</div>
+      <div class="feature-item done"><span class="dot"></span>Browse all job listings (available on homepage)</div>
+      <div class="feature-item"><span class="dot"></span>Keyword search for jobs</div>
+      <div class="feature-item"><span class="dot"></span>Top 10 recommended jobs based on your profile</div>
+    </div>
+  </div>
+</body>
+</html>

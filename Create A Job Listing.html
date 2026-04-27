@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Job Listing — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26,26,24,0.1);
+      --border-md: rgba(26,26,24,0.18);
+      --danger: #A33A3A;
+      --danger-bg: #FBEAEA;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(244,241,236,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      height: 60px;
+      z-index: 10;
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .nav-logo span { color: var(--green); }
+
+    .back-link {
+      font-size: 14px;
+      color: var(--ink-soft);
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1050px;
+      margin: 70px auto;
+      padding: 0 2rem 80px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      color: var(--ink-soft);
+      max-width: 650px;
+      margin: auto;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .job-form {
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .form-card {
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border-md);
+    }
+
+    .form-card:first-child { padding-top: 0; }
+    .form-card:last-child { border-bottom: none; padding-bottom: 0; }
+
+    h2 {
+      margin-bottom: 18px;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-md);
+      background: #F7F5F1;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    textarea { resize: vertical; }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .tag-area {
+      margin-bottom: 10px;
+      min-height: 34px;
+    }
+
+    .tag-area:empty::before {
+      content: "No items added yet";
+      color: var(--ink-soft);
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    .tag-area {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag-area span {
+      background: var(--green-bg);
+      color: var(--green);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--green);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tag-area span:hover {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    button {
+      border: 1px solid var(--border-md);
+      background: white;
+      border-radius: 20px;
+      padding: 9px 16px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    button:hover {
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    .add-btn {
+      margin-top: 10px;
+    }
+
+    .submit-btn {
+      margin-top: 30px;
+      width: 100%;
+      background: var(--green);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .submit-btn:hover {
+      color: white;
+      opacity: 0.9;
+    }
+
+    .helper-text {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+  <a href="employer-account.html" class="back-link">← Back to company account</a>
+</nav>
+
+<main class="page">
+
+  <div class="page-header">
+    <h1>Create A Job Listing</h1>
+    <p>Add the role details, required skills, education requirements, and application deadline so candidates can apply.</p>
+  </div>
+
+  <form class="job-form">
+
+    <section class="form-card">
+      <h2>Job Details</h2>
+
+      <div class="two-column">
+        <div>
+          <label>Job Title</label>
+          <input type="text" placeholder="e.g. Junior Web Developer" required>
+        </div>
+
+        <div>
+          <label>Job Type</label>
+          <select required>
+            <option value="">Select job type</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Casual</option>
+            <option>Internship</option>
+            <option>Graduate Program</option>
+            <option>Contract</option>
+            <option>Remote</option>
+            <option>Hybrid</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div>
+          <label>Location</label>
+          <input type="text" placeholder="e.g. Sydney, NSW">
+        </div>
+
+        <div>
+          <label>Experience Level</label>
+          <select>
+            <option value="">Select experience level</option>
+            <option>Entry Level</option>
+            <option>Graduate</option>
+            <option>Junior</option>
+            <option>Mid-level</option>
+            <option>Senior</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Salary Range</label>
+      <div class="two-column">
+        <input type="number" placeholder="Minimum salary">
+        <input type="number" placeholder="Maximum salary">
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Required Skills</h2>
+
+      <div class="tag-area" id="skillTags"></div>
+
+      <select id="skillSelect">
+        <option value="">Select required skill</option>
+        <option>Problem Solving</option>
+        <option>HTML</option>
+        <option>CSS</option>
+        <option>JavaScript</option>
+        <option>Python</option>
+        <option>Java</option>
+        <option>C++</option>
+        <option>SQL</option>
+        <option>React</option>
+        <option>Communication</option>
+        <option>Teamwork</option>
+        <option>Leadership</option>
+        <option>Time Management</option>
+        <option>Project Management</option>
+        <option>Data Analysis</option>
+        <option>UI/UX Design</option>
+        <option>Cloud Computing</option>
+      </select>
+
+      <button type="button" class="add-btn" onclick="addTag('skillSelect', 'skillTags')">+ Add skill</button>
+      <p class="helper-text">Click a bubble to remove it.</p>
+    </section>
+
+    <section class="form-card">
+      <h2>Education Requirement</h2>
+
+      <label>Level</label>
+      <div class="tag-area" id="educationLevelTags"></div>
+
+      <select id="educationLevelSelect">
+        <option value="">Select education level</option>
+        <option>Certificate</option>
+        <option>Diploma</option>
+        <option>Advanced Diploma</option>
+        <option>Bachelors Degree</option>
+        <option>Masters Degree</option>
+        <option>PhD</option>
+        <option>No formal requirement</option>
+      </select>
+
+      <button type="button" class="add-btn" onclick="addTag('educationLevelSelect', 'educationLevelTags')">+ Add level</button>
+
+      <label>Area</label>
+      <div class="tag-area" id="educationAreaTags"></div>
+
+      <select id="educationAreaSelect">
+        <option value="">Select study area</option>
+        <option>Information Technology</option>
+        <option>Computer Science</option>
+        <option>Software Engineering</option>
+        <option>Web Design</option>
+        <option>Data Science</option>
+        <option>Cyber Security</option>
+        <option>Business Information Systems</option>
+        <option>Engineering</option>
+        <option>Marketing</option>
+        <option>Business</option>
+        <option>Any relevant field</option>
+      </select>
+
+      <button type="button" class="add-btn" onclick="addTag('educationAreaSelect', 'educationAreaTags')">+ Add area</button>
+      <p class="helper-text">The bubbles above are created when the user adds a selected option.</p>
+    </section>
+
+    <section class="form-card">
+      <h2>Job Description</h2>
+      <textarea rows="7" placeholder="Describe the role, responsibilities, expectations, and ideal candidate."></textarea>
+    </section>
+
+    <section class="form-card">
+      <h2>Application Deadline</h2>
+      <input type="date">
+    </section>
+
+    <button type="submit" class="submit-btn">Publish Job Listing</button>
+
+  </form>
+</main>
+
+<script>
+  function addTag(selectId, tagContainerId) {
+    const select = document.getElementById(selectId);
+    const selectedValue = select.value;
+    const tagContainer = document.getElementById(tagContainerId);
+
+    if (selectedValue === "") return;
+
+    const existingTags = Array.from(tagContainer.querySelectorAll("span"))
+      .map(tag => tag.textContent);
+
+    if (existingTags.includes(selectedValue)) return;
+
+    const newTag = document.createElement("span");
+    newTag.textContent = selectedValue;
+    newTag.title = "Click to remove";
+    newTag.onclick = function () {
+      newTag.remove();
+    };
+
+    tagContainer.appendChild(newTag);
+    select.value = "";
+  }
+</script>
+
+</body>
+</html>

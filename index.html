@@ -284,6 +284,112 @@
       color: var(--ink-muted); font-size: 14px;
     }
     .empty-state p:first-child { font-size: 24px; margin-bottom: 8px; }
+
+    /* ── Candidate Login Popup ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,24,0.45);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 1.5rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      position: relative;
+      text-align: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      border: none;
+      background: transparent;
+      font-size: 22px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: var(--ink);
+    }
+
+    .modal-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      background: var(--accent-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 18px;
+    }
+
+    .modal-box h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      text-decoration: none;
+      border-radius: 24px;
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.15s;
+    }
+
+    .modal-btn.primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .modal-btn.primary:hover {
+      opacity: 0.88;
+    }
+
+    .modal-btn.secondary {
+      background: var(--bg);
+      color: var(--ink);
+      border: 1px solid var(--border-md);
+    }
+
+    .modal-btn.secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
   </style>
 </head>
 <body>
@@ -298,6 +404,23 @@
     </div>
   </nav>
 
+  <!-- Candidate Login / Create Account Popup -->
+  <div class="modal-overlay" id="candidateModal" onclick="closeCandidateModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeCandidateModal()">×</button>
+
+      <div class="modal-icon">🎓</div>
+      <h2>Candidate Portal</h2>
+      <p>Log in to view your profile and recommendations, or create an account to get started.</p>
+
+      <div class="modal-actions">
+        <a href="candidate-login.html" class="modal-btn secondary">Log in</a>
+        <a href="Candidate.html" class="modal-btn primary">Create an account</a>
+      </div>
+    </div>
+  </div>
+
+
   <!-- Hero -->
   <section class="hero">
     <div class="hero-eyebrow">Intelligent Matching Platform</div>
@@ -305,7 +428,7 @@
     <p>Two-way intelligent matching that connects the right candidates with the right opportunities — no endless scrolling required.</p>
 
     <div class="portal-grid">
-      <a href="candidate.html" class="portal-card candidate">
+      <a href="#" class="portal-card candidate" onclick="openCandidateModal(event)">
         <div class="portal-icon">🎓</div>
         <div>
           <h2>I'm a Candidate</h2>
@@ -353,6 +476,24 @@
   </section>
 
   <script>
+
+    function openCandidateModal(event) {
+      event.preventDefault();
+      document.getElementById('candidateModal').classList.add('active');
+    }
+
+    function closeCandidateModal(event) {
+      if (!event || event.target.id === 'candidateModal' || event.target.classList.contains('modal-close')) {
+        document.getElementById('candidateModal').classList.remove('active');
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        document.getElementById('candidateModal').classList.remove('active');
+      }
+    });
+
     // ── Sample job data (mirrors the seed data in schema.sql) ──
     const jobs = [
       {

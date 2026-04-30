@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentMatch — Job Listings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --bg-soft: #F8F5F0;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
+      --ink-muted: #9C9C90;
+      --accent: #2B5CE6;
+      --accent-bg: #EEF2FD;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26, 26, 24, 0.1);
+      --border-md: rgba(26, 26, 24, 0.18);
+      --shadow: 0 20px 50px rgba(26, 26, 24, 0.08);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(244, 241, 236, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 999px;
+      transition: 0.18s ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(26, 26, 24, 0.06);
+      color: var(--ink);
+    }
+
+    .nav-links .btn-nav {
+      background: var(--ink);
+      color: white;
+    }
+
+    .nav-links .btn-nav:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .hero {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 48px 2rem 24px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+      max-width: 760px;
+    }
+
+    .hero h1 em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .hero p {
+      max-width: 620px;
+      color: var(--ink-soft);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .search-shell {
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr auto;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 14px;
+      padding: 0 14px;
+      min-height: 56px;
+    }
+
+    .field-icon {
+      font-size: 16px;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .field input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .field input::placeholder { color: var(--ink-muted); }
+
+    .search-btn {
+      border: none;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0 24px;
+      min-height: 56px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .search-btn:hover { opacity: 0.9; }
+
+    .page-shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 2rem 72px;
+    }
+
+    .results-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .results-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 25px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .results-subtitle {
+      color: var(--ink-muted);
+      font-size: 13px;
+    }
+
+    .job-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .job-item {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: 0.18s ease;
+      position: relative;
+    }
+
+    .job-item:last-child { border-bottom: none; }
+
+    .job-item:hover {
+      background: #FAF7F2;
+    }
+
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .job-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .company-line {
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: var(--accent-bg);
+      flex-shrink: 0;
+    }
+
+    .job-badges,
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--ink-soft);
+      background: var(--bg);
+    }
+
+    .badge.mode-Remote {
+      background: var(--green-bg);
+      border-color: transparent;
+      color: var(--green);
+    }
+
+    .badge.mode-Hybrid {
+      background: var(--accent-bg);
+      border-color: transparent;
+      color: var(--accent);
+    }
+
+    .badge.mode-On-site {
+      background: #FDF3E7;
+      border-color: transparent;
+      color: #A46000;
+    }
+
+    .job-snippet {
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 12px 0 14px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    .job-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 12px;
+      color: var(--ink-muted);
+      font-size: 12px;
+    }
+
+    .match-score {
+      color: var(--green);
+      font-weight: 700;
+      background: var(--green-bg);
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .tag {
+      font-size: 12px;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 11px;
+    }
+
+    @media (max-width: 780px) {
+      nav, .hero, .page-shell { padding-left: 1rem; padding-right: 1rem; }
+
+      .search-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-top {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="candidate.html">Candidates</a>
+      <a href="employer.html">Employers</a>
+      <a href="#" class="btn-nav">Sign in</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Job discovery experience</div>
+        <h1>Search once, compare clearly, and find a role that feels <em>right</em></h1>
+      </div>
+    </div>
+
+    <div class="search-shell">
+      <div class="search-grid">
+        <div class="field">
+          <span class="field-icon">🔎</span>
+          <input id="keywordInput" type="text" placeholder="Job title, keyword, skill, or company" />
+        </div>
+        <div class="field">
+          <span class="field-icon">📍</span>
+          <input id="locationInput" type="text" placeholder="City, state, or remote" />
+        </div>
+        <button class="search-btn" id="searchButton">Find jobs</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="page-shell">
+    <section class="results-panel">
+      <div class="results-header">
+        <div class="results-title">Latest job listings</div>
+        <div class="results-subtitle" id="resultsText">Showing all available roles</div>
+      </div>
+      <div class="job-list" id="jobList"></div>
+    </section>
+  </main>
+
+  <script>
+    const jobs = [
+      {
+        id: 1,
+        title: 'Junior Frontend Developer',
+        company: 'TechCorp Australia',
+        logo: '💻',
+        mode: 'Hybrid',
+        location: 'Sydney, NSW',
+        experience: 'Entry level',
+        salary: '$75,000 – $90,000 a year',
+        posted: '2 days ago',
+        match: '94% match',
+        skills: ['React', 'JavaScript', 'CSS', 'Git'],
+        description: 'Join a product team designing polished digital interfaces for a growing platform. You will help build responsive components, support feature delivery, and collaborate with senior engineers on accessible frontend systems.'
+      },
+      {
+        id: 2,
+        title: 'Data Analyst',
+        company: 'TechCorp Australia',
+        logo: '📊',
+        mode: 'Remote',
+        location: 'Sydney, NSW',
+        experience: 'Mid level',
+        salary: '$88,000 – $105,000 a year',
+        posted: '3 days ago',
+        match: '89% match',
+        skills: ['Python', 'SQL', 'Pandas', 'Tableau'],
+        description: 'Help teams make sharper decisions through analysis, dashboards, and reporting. This role suits someone who can interpret data clearly and communicate insights to technical and non-technical stakeholders.'
+      },
+      {
+        id: 3,
+        title: 'Backend Engineer',
+        company: 'TechCorp Australia',
+        logo: '⚙️',
+        mode: 'On-site',
+        location: 'Melbourne, VIC',
+        experience: 'Senior',
+        salary: '$125,000 – $145,000 a year',
+        posted: '5 days ago',
+        match: '86% match',
+        skills: ['Java', 'Spring Boot', 'Docker', 'PostgreSQL'],
+        description: 'Design and maintain scalable services that support enterprise-grade applications. You will work on APIs, infrastructure, and system reliability in a team focused on long-term maintainability.'
+      },
+      {
+        id: 4,
+        title: 'Full Stack Developer',
+        company: 'WebCo',
+        logo: '🌐',
+        mode: 'Hybrid',
+        location: 'Brisbane, QLD',
+        experience: 'Mid level',
+        salary: '$95,000 – $115,000 a year',
+        posted: '1 week ago',
+        match: '91% match',
+        skills: ['React', 'Node.js', 'SQL', 'REST APIs'],
+        description: 'Take ownership of features across both frontend and backend surfaces. This role is suited to developers who enjoy variety, product velocity, and shipping polished web experiences end to end.'
+      },
+      {
+        id: 5,
+        title: 'UI/UX Designer',
+        company: 'WebCo',
+        logo: '🎨',
+        mode: 'Remote',
+        location: 'Remote',
+        experience: 'Mid level',
+        salary: '$90,000 – $110,000 a year',
+        posted: '1 week ago',
+        match: '88% match',
+        skills: ['Figma', 'User Research', 'Prototyping', 'Design Systems'],
+        description: 'Shape intuitive experiences across digital products, from early wireframes to polished interfaces. You will work closely with engineering and product teams to improve usability and consistency.'
+      },
+      {
+        id: 6,
+        title: 'Cyber Security Analyst',
+        company: 'ShieldPoint',
+        logo: '🛡️',
+        mode: 'Hybrid',
+        location: 'Sydney, NSW',
+        experience: 'Entry level',
+        salary: '$82,000 – $98,000 a year',
+        posted: '4 days ago',
+        match: '96% match',
+        skills: ['SIEM', 'Incident Response', 'Risk Assessment', 'Networking'],
+        description: 'Monitor alerts, investigate suspicious activity, and support operational security across internal systems. A strong role for someone building their cyber career with hands-on exposure to real incidents.'
+      }
+    ];
+
+    const state = {
+      keyword: '',
+      location: ''
+    };
+
+    const jobList = document.getElementById('jobList');
+    const resultsText = document.getElementById('resultsText');
+
+    function filteredJobs() {
+      const keyword = state.keyword.trim().toLowerCase();
+      const location = state.location.trim().toLowerCase();
+
+      return jobs.filter(job => {
+        const keywordMatch = !keyword ||
+          job.title.toLowerCase().includes(keyword) ||
+          job.company.toLowerCase().includes(keyword) ||
+          job.description.toLowerCase().includes(keyword) ||
+          job.skills.some(skill => skill.toLowerCase().includes(keyword));
+
+        const locationMatch = !location ||
+          job.location.toLowerCase().includes(location) ||
+          job.mode.toLowerCase().includes(location);
+
+        return keywordMatch && locationMatch;
+      });
+    }
+
+    function renderJobs() {
+      const filtered = filteredJobs();
+
+      resultsText.textContent = filtered.length === jobs.length
+        ? `Showing all ${jobs.length} available roles`
+        : `Showing ${filtered.length} of ${jobs.length} available roles`;
+
+      if (!filtered.length) {
+        jobList.innerHTML = `
+          <div class="job-item">
+            <div class="job-title">No jobs found</div>
+            <div class="company-line">Try adjusting your keyword or location.</div>
+          </div>
+        `;
+        return;
+      }
+
+      jobList.innerHTML = filtered.map(job => `
+        <div class="job-item">
+          <div class="job-top">
+            <div>
+              <div class="job-title">${job.title}</div>
+              <div class="company-line">${job.company}</div>
+            </div>
+            <div class="logo">${job.logo}</div>
+          </div>
+
+          <div class="job-badges">
+            <span class="badge mode-${job.mode}">${job.mode}</span>
+            <span class="badge">📍 ${job.location}</span>
+            <span class="badge">🧭 ${job.experience}</span>
+            <span class="badge">💰 ${job.salary}</span>
+          </div>
+
+          <p class="job-snippet">${job.description}</p>
+
+          <div class="tags">
+            ${job.skills.map(skill => `<span class="tag">${skill}</span>`).join('')}
+          </div>
+
+          <div class="job-footer">
+            <span>Posted ${job.posted}</span>
+            <span class="match-score">${job.match}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function bindInputs() {
+      document.getElementById('keywordInput').addEventListener('input', e => {
+        state.keyword = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('locationInput').addEventListener('input', e => {
+        state.location = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('searchButton').addEventListener('click', () => {
+        renderJobs();
+      });
+    }
+
+    bindInputs();
+    renderJobs();
+  </script>
+</body>
+</html>

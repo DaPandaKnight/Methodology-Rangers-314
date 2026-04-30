@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalentMatch — Job Listings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --bg-soft: #F8F5F0;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
+      --ink-muted: #9C9C90;
+      --accent: #2B5CE6;
+      --accent-bg: #EEF2FD;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26, 26, 24, 0.1);
+      --border-md: rgba(26, 26, 24, 0.18);
+      --shadow: 0 20px 50px rgba(26, 26, 24, 0.08);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(244, 241, 236, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 999px;
+      transition: 0.18s ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(26, 26, 24, 0.06);
+      color: var(--ink);
+    }
+
+    .nav-links .btn-nav {
+      background: var(--ink);
+      color: white;
+    }
+
+    .nav-links .btn-nav:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .hero {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 48px 2rem 24px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+      max-width: 760px;
+    }
+
+    .hero h1 em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .hero p {
+      max-width: 620px;
+      color: var(--ink-soft);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .hero-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      min-width: 220px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-stat-label {
+      color: var(--ink-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .hero-stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      letter-spacing: -0.03em;
+    }
+
+    .search-shell {
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr auto;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 14px;
+      padding: 0 14px;
+      min-height: 56px;
+    }
+
+    .field-icon {
+      font-size: 16px;
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+
+    .field input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .field input::placeholder { color: var(--ink-muted); }
+
+    .search-btn {
+      border: none;
+      border-radius: 14px;
+      background: var(--accent);
+      color: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0 24px;
+      min-height: 56px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .search-btn:hover { opacity: 0.9; }
+
+    .page-shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 2rem 72px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .sidebar,
+    .results-panel,
+    .detail-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 92px;
+      padding: 22px;
+    }
+
+    .sidebar-section + .sidebar-section {
+      margin-top: 22px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .filter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    .filter-item label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .filter-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .count-pill {
+      font-size: 11px;
+      color: var(--ink-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    .salary-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .content-area {
+      display: grid;
+      grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .results-panel {
+      overflow: hidden;
+    }
+
+    .results-header,
+    .detail-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 25px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .results-subtitle {
+      color: var(--ink-muted);
+      font-size: 13px;
+    }
+
+    .job-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .job-item {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: 0.18s ease;
+      position: relative;
+    }
+
+    .job-item:last-child { border-bottom: none; }
+
+    .job-item:hover {
+      background: #FAF7F2;
+    }
+
+    .job-item.active {
+      background: #FAF7F2;
+    }
+
+    .job-item.active::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      bottom: 16px;
+      left: 10px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .job-item-inner {
+      padding-left: 8px;
+    }
+
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .job-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .company-line {
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: var(--accent-bg);
+      flex-shrink: 0;
+    }
+
+    .job-badges,
+    .detail-badges,
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--ink-soft);
+      background: var(--bg);
+    }
+
+    .badge.mode-Remote {
+      background: var(--green-bg);
+      border-color: transparent;
+      color: var(--green);
+    }
+
+    .badge.mode-Hybrid {
+      background: var(--accent-bg);
+      border-color: transparent;
+      color: var(--accent);
+    }
+
+    .badge.mode-On-site {
+      background: #FDF3E7;
+      border-color: transparent;
+      color: #A46000;
+    }
+
+    .job-snippet {
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 12px 0 14px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    .job-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 12px;
+      color: var(--ink-muted);
+      font-size: 12px;
+    }
+
+    .match-score {
+      color: var(--green);
+      font-weight: 700;
+      background: var(--green-bg);
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .detail-panel {
+      overflow: hidden;
+      min-height: 100%;
+    }
+
+    .detail-body {
+      padding: 24px 22px 28px;
+    }
+
+    .detail-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .detail-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .detail-company {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0 22px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      border: none;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--accent); }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1px solid var(--border-md);
+    }
+
+    .btn-secondary:hover {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 22px 0 26px;
+    }
+
+    .metric-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .metric-label {
+      color: var(--ink-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .section + .section {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section p,
+    .section li {
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .section ul {
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 12px;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 11px;
+    }
+
+    .detail-note {
+      margin-top: 24px;
+      background: linear-gradient(135deg, var(--accent-bg), #F8FAFF);
+      border: 1px solid rgba(43, 92, 230, 0.14);
+      color: var(--accent);
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1100px) {
+      .page-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .content-area {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 780px) {
+      nav, .hero, .page-shell { padding-left: 1rem; padding-right: 1rem; }
+
+      .search-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-top {
+        align-items: flex-start;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="candidate.html">Candidates</a>
+      <a href="employer.html">Employers</a>
+      <a href="#" class="btn-nav">Sign in</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Job discovery experience</div>
+        <h1>Search once, compare clearly, and find a role that feels <em>right</em></h1>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-label">Open positions</div>
+        <div class="hero-stat-value" id="open-count">12 roles</div>
+      </div>
+    </div>
+
+    <div class="search-shell">
+      <div class="search-grid">
+        <div class="field">
+          <span class="field-icon">🔎</span>
+          <input id="keywordInput" type="text" placeholder="Job title, keyword, skill, or company" />
+        </div>
+        <div class="field">
+          <span class="field-icon">📍</span>
+          <input id="locationInput" type="text" placeholder="City, state, or remote" />
+        </div>
+        <button class="search-btn" id="searchButton">Find jobs</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>Work mode</h3>
+        <div class="filter-list" id="modeFilters"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Experience level</h3>
+        <div class="filter-list" id="experienceFilters"></div>
+      </div>
+
+    </aside>
+
+    <section class="content-area">
+      <div class="results-panel">
+        <div class="results-header">
+          <div class="results-title">Latest job listings</div>
+          <div class="results-subtitle" id="resultsText">Showing all available roles</div>
+        </div>
+        <div class="job-list" id="jobList"></div>
+      </div>
+
+      <article class="detail-panel">
+        <div class="detail-header">
+          <div class="results-subtitle">Selected job</div>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const jobs = [
+      {
+        id: 1,
+        title: 'Junior Frontend Developer',
+        company: 'TechCorp Australia',
+        logo: '💻',
+        mode: 'Hybrid',
+        location: 'Sydney, NSW',
+        experience: 'Entry level',
+        salary: '$75,000 – $90,000 a year',
+        posted: '2 days ago',
+        match: '94% match',
+        skills: ['React', 'JavaScript', 'CSS', 'Git'],
+        description: 'Join a product team designing polished digital interfaces for a growing platform. You will help build responsive components, support feature delivery, and collaborate with senior engineers on accessible frontend systems.',
+        responsibilities: [
+          'Build reusable React components and polished page layouts',
+          'Work with designers to translate wireframes into production-ready UI',
+          'Support testing, iteration, and bug fixing across web experiences'
+        ],
+        about: 'This is a strong starting role for a junior developer who enjoys clean UI, product thinking, and collaborative delivery. You will gain exposure to modern frontend workflows while contributing to customer-facing features.'
+      },
+      {
+        id: 2,
+        title: 'Data Analyst',
+        company: 'TechCorp Australia',
+        logo: '📊',
+        mode: 'Remote',
+        location: 'Sydney, NSW',
+        experience: 'Mid level',
+        salary: '$88,000 – $105,000 a year',
+        posted: '3 days ago',
+        match: '89% match',
+        skills: ['Python', 'SQL', 'Pandas', 'Tableau'],
+        description: 'Help teams make sharper decisions through analysis, dashboards, and reporting. This role suits someone who can interpret data clearly and communicate insights to technical and non-technical stakeholders.',
+        responsibilities: [
+          'Prepare and clean datasets for reporting and exploration',
+          'Build dashboards and communicate trends to stakeholders',
+          'Partner with teams to define useful product and business metrics'
+        ],
+        about: 'A flexible role for an analytical thinker who enjoys turning complexity into clarity. The team values structured thinking, clean reporting, and practical recommendations.'
+      },
+      {
+        id: 3,
+        title: 'Backend Engineer',
+        company: 'TechCorp Australia',
+        logo: '⚙️',
+        mode: 'On-site',
+        location: 'Melbourne, VIC',
+        experience: 'Senior',
+        salary: '$125,000 – $145,000 a year',
+        posted: '5 days ago',
+        match: '86% match',
+        skills: ['Java', 'Spring Boot', 'Docker', 'PostgreSQL'],
+        description: 'Design and maintain scalable services that support enterprise-grade applications. You will work on APIs, infrastructure, and system reliability in a team focused on long-term maintainability.',
+        responsibilities: [
+          'Develop backend services and maintain robust API architecture',
+          'Improve performance, observability, and platform stability',
+          'Collaborate on architecture decisions and code quality practices'
+        ],
+        about: 'Ideal for someone who enjoys systems thinking, clear engineering standards, and backend performance. This role carries strong ownership and close cross-functional work.'
+      },
+      {
+        id: 4,
+        title: 'Full Stack Developer',
+        company: 'WebCo',
+        logo: '🌐',
+        mode: 'Hybrid',
+        location: 'Brisbane, QLD',
+        experience: 'Mid level',
+        salary: '$95,000 – $115,000 a year',
+        posted: '1 week ago',
+        match: '91% match',
+        skills: ['React', 'Node.js', 'SQL', 'REST APIs'],
+        description: 'Take ownership of features across both frontend and backend surfaces. This role is suited to developers who enjoy variety, product velocity, and shipping polished web experiences end to end.',
+        responsibilities: [
+          'Develop end-to-end product features across the stack',
+          'Coordinate with design, QA, and product on launch readiness',
+          'Maintain reliable APIs and user-facing interfaces'
+        ],
+        about: 'A balanced role for a developer who wants broad technical exposure with meaningful ownership. Fast-moving, practical, and highly collaborative.'
+      },
+      {
+        id: 5,
+        title: 'UI/UX Designer',
+        company: 'WebCo',
+        logo: '🎨',
+        mode: 'Remote',
+        location: 'Remote',
+        experience: 'Mid level',
+        salary: '$90,000 – $110,000 a year',
+        posted: '1 week ago',
+        match: '88% match',
+        skills: ['Figma', 'User Research', 'Prototyping', 'Design Systems'],
+        description: 'Shape intuitive experiences across digital products, from early wireframes to polished interfaces. You will work closely with engineering and product teams to improve usability and consistency.',
+        responsibilities: [
+          'Run user research and translate findings into design decisions',
+          'Create wireframes, prototypes, and refined UI systems',
+          'Support design QA and interface consistency across features'
+        ],
+        about: 'A great fit for a designer who cares about clarity, flow, and elegant interaction patterns. The team values thoughtful design, not just visual polish.'
+      },
+      {
+        id: 6,
+        title: 'Cyber Security Analyst',
+        company: 'ShieldPoint',
+        logo: '🛡️',
+        mode: 'Hybrid',
+        location: 'Sydney, NSW',
+        experience: 'Entry level',
+        salary: '$82,000 – $98,000 a year',
+        posted: '4 days ago',
+        match: '96% match',
+        skills: ['SIEM', 'Incident Response', 'Risk Assessment', 'Networking'],
+        description: 'Monitor alerts, investigate suspicious activity, and support operational security across internal systems. A strong role for someone building their cyber career with hands-on exposure to real incidents.',
+        responsibilities: [
+          'Triage and investigate alerts across monitoring tools',
+          'Document incidents and assist with response coordination',
+          'Support security posture reviews and internal risk reduction'
+        ],
+        about: 'This role blends learning and responsibility, making it strong for emerging cyber professionals who want practical exposure in a guided environment.'
+      }
+    ];
+
+    const modeOptions = ['Remote', 'Hybrid', 'On-site'];
+    const experienceOptions = ['Entry level', 'Mid level', 'Senior'];
+
+    const state = {
+      keyword: '',
+      location: '',
+      modes: new Set(),
+      experience: new Set(),
+      selectedId: jobs[0].id
+    };
+
+    const jobList = document.getElementById('jobList');
+    const detailBody = document.getElementById('detailBody');
+    const resultsText = document.getElementById('resultsText');
+    const openCount = document.getElementById('open-count');
+
+    function createFilterGroup(containerId, options, key) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = options.map(option => {
+        const count = jobs.filter(job => job[key] === option).length;
+        return `
+          <div class="filter-item">
+            <label>
+              <input type="checkbox" value="${option}" data-filter-group="${key}" />
+              <span>${option}</span>
+            </label>
+            <span class="count-pill">${count}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filteredJobs() {
+      const keyword = state.keyword.trim().toLowerCase();
+      const location = state.location.trim().toLowerCase();
+
+      return jobs.filter(job => {
+        const keywordMatch = !keyword ||
+          job.title.toLowerCase().includes(keyword) ||
+          job.company.toLowerCase().includes(keyword) ||
+          job.description.toLowerCase().includes(keyword) ||
+          job.skills.some(skill => skill.toLowerCase().includes(keyword));
+
+        const locationMatch = !location ||
+          job.location.toLowerCase().includes(location) ||
+          job.mode.toLowerCase().includes(location);
+
+        const modeMatch = state.modes.size === 0 || state.modes.has(job.mode);
+        const experienceMatch = state.experience.size === 0 || state.experience.has(job.experience);
+
+        return keywordMatch && locationMatch && modeMatch && experienceMatch;
+      });
+    }
+
+    function ensureSelected(filtered) {
+      if (!filtered.length) {
+        state.selectedId = null;
+        return;
+      }
+
+      const stillVisible = filtered.some(job => job.id === state.selectedId);
+      if (!stillVisible) state.selectedId = filtered[0].id;
+    }
+
+    function renderJobs() {
+      const filtered = filteredJobs();
+      ensureSelected(filtered);
+      openCount.textContent = `${jobs.length} roles`;
+      resultsText.textContent = filtered.length === jobs.length
+        ? `Showing all ${jobs.length} available roles`
+        : `Showing ${filtered.length} of ${jobs.length} available roles`;
+
+      if (!filtered.length) {
+        jobList.innerHTML = `
+          <div class="job-item">
+            <div class="job-item-inner">
+              <div class="job-title">No jobs found</div>
+              <p class="job-snippet">Try adjusting your keyword, location, or filters to see more results.</p>
+            </div>
+          </div>
+        `;
+        detailBody.innerHTML = `
+          <div class="detail-kicker">No match</div>
+          <div class="detail-title">Nothing fits your current filters</div>
+          <p class="detail-company">Try clearing one or two filters to broaden the results.</p>
+        `;
+        return;
+      }
+
+      jobList.innerHTML = filtered.map(job => `
+        <div class="job-item ${job.id === state.selectedId ? 'active' : ''}" data-id="${job.id}">
+          <div class="job-item-inner">
+            <div class="job-top">
+              <div>
+                <div class="job-title">${job.title}</div>
+                <div class="company-line">${job.company}</div>
+              </div>
+              <div class="logo">${job.logo}</div>
+            </div>
+
+            <div class="job-badges">
+              <span class="badge mode-${job.mode}">${job.mode}</span>
+              <span class="badge">📍 ${job.location}</span>
+              <span class="badge">🧭 ${job.experience}</span>
+            </div>
+
+            <p class="job-snippet">${job.description}</p>
+
+            <div class="tags">
+              ${job.skills.slice(0, 4).map(skill => `<span class="tag">${skill}</span>`).join('')}
+            </div>
+
+            <div class="job-footer">
+              <span>Posted ${job.posted}</span>
+              <span class="match-score">${job.match}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.job-item[data-id]').forEach(item => {
+        item.addEventListener('click', () => {
+          state.selectedId = Number(item.dataset.id);
+          renderJobs();
+        });
+      });
+
+      renderDetail(filtered.find(job => job.id === state.selectedId));
+    }
+
+    function renderDetail(job) {
+      if (!job) return;
+
+      detailBody.innerHTML = `
+        <div class="detail-kicker">Recommended role</div>
+        <div class="detail-title">${job.title}</div>
+        <div class="detail-company">${job.company} · ${job.location}</div>
+
+        <div class="detail-badges">
+          <span class="badge mode-${job.mode}">${job.mode}</span>
+          <span class="badge">💼 ${job.experience}</span>
+          <span class="badge">💰 ${job.salary}</span>
+          <span class="badge">🕒 Posted ${job.posted}</span>
+        </div>
+
+        <div class="detail-actions">
+          <button class="btn-primary">Apply now</button>
+          <button class="btn-secondary">Save role</button>
+          <button class="btn-secondary">Share</button>
+        </div>
+
+        <div class="detail-grid">
+          <div class="metric-card">
+            <div class="metric-label">Estimated pay</div>
+            <div class="metric-value">${job.salary}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Work setup</div>
+            <div class="metric-value">${job.mode}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">TalentMatch score</div>
+            <div class="metric-value">${job.match}</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>About the role</h3>
+          <p>${job.about}</p>
+        </div>
+
+        <div class="section">
+          <h3>What you'll do</h3>
+          <ul>
+            ${job.responsibilities.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>Skills and tools</h3>
+          <div class="tags">
+            ${job.skills.map(skill => `<span class="tag">${skill}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="detail-note">
+          This page keeps the warm serif-and-sans visual identity from your existing files, while borrowing the split-view browsing pattern users already know from job boards like Indeed.
+        </div>
+      `;
+    }
+
+    function bindInputs() {
+      document.getElementById('keywordInput').addEventListener('input', e => {
+        state.keyword = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('locationInput').addEventListener('input', e => {
+        state.location = e.target.value;
+        renderJobs();
+      });
+
+      document.getElementById('searchButton').addEventListener('click', () => {
+        renderJobs();
+      });
+
+      document.addEventListener('change', e => {
+        if (!e.target.matches('input[type="checkbox"][data-filter-group]')) return;
+
+        const group = e.target.dataset.filterGroup;
+        const set = group === 'mode' ? state.modes : state.experience;
+
+        if (e.target.checked) set.add(e.target.value);
+        else set.delete(e.target.value);
+
+        renderJobs();
+      });
+    }
+
+    createFilterGroup('modeFilters', modeOptions, 'mode');
+    createFilterGroup('experienceFilters', experienceOptions, 'experience');
+    bindInputs();
+    renderJobs();
+  </script>
+</body>
+</html>

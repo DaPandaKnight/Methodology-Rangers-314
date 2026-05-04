@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create a Employer Account — TalentMatch</title>
+  <title>Create an Employer Account — TalentMatch</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -128,12 +128,6 @@
       gap: 20px;
     }
 
-    .three-column {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
-
     .logo-upload {
       text-align: center;
       background: var(--green-bg);
@@ -153,6 +147,14 @@
       align-items: center;
       justify-content: center;
       font-size: 40px;
+      overflow: hidden;
+    }
+
+    .logo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
     }
 
     button {
@@ -180,24 +182,6 @@
       font-weight: 500;
     }
 
-    .skill-tags {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-
-    .skill-tags span {
-      background: var(--green-bg);
-      color: var(--green);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      border: 1px solid var(--green);
-    }
-
-    .hidden { display: none; }
-
     .small-note {
       color: var(--ink-soft);
       font-size: 13px;
@@ -205,8 +189,7 @@
     }
 
     @media (max-width: 768px) {
-      .two-column,
-      .three-column {
+      .two-column {
         grid-template-columns: 1fr;
       }
 
@@ -220,32 +203,32 @@
 <body>
 
 <nav>
-  <a href="#" class="nav-logo">Talent<span>Match</span></a>
-  <a href="#" class="back-link">← Back</a>
+  <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+  <a href="index.html" class="back-link">← Back</a>
 </nav>
 
 <main class="page">
 
-  <!-- PAGE 1: COMPANY ACCOUNT -->
   <section id="companyAccountPage">
     <div class="page-header">
       <h1>Create A Company Account</h1>
       <p>Enter your company details first. Once the employer account is created, you can continue to create a job listing.</p>
     </div>
 
-    <form class="form-box" onsubmit="showJobListingPage(event)">
+    <form class="form-box" onsubmit="createCompanyAccount(event)">
+
       <section class="form-card">
         <h2>Company Details</h2>
 
         <div class="two-column">
           <div>
             <label>Company Name</label>
-            <input type="text" required>
+            <input type="text" id="companyName" required>
           </div>
 
           <div>
             <label>Industry</label>
-            <select required>
+            <select id="companyIndustry" required>
               <option value="">Select industry</option>
               <option>Information Technology</option>
               <option>Finance</option>
@@ -260,10 +243,10 @@
         </div>
 
         <label>Company Website</label>
-        <input type="url" placeholder="https://example.com">
+        <input type="url" id="companyWebsite" placeholder="https://example.com">
 
         <label>Company Location</label>
-        <input type="text" placeholder="Wollongong, NSW">
+        <input type="text" id="companyLocation" placeholder="Wollongong, NSW">
       </section>
 
       <section class="form-card">
@@ -272,24 +255,24 @@
         <div class="two-column">
           <div>
             <label>Contact Full Name</label>
-            <input type="text" required>
+            <input type="text" id="contactName" required>
           </div>
 
           <div>
             <label>Position / Role</label>
-            <input type="text" placeholder="Hiring Manager">
+            <input type="text" id="contactPosition" placeholder="Hiring Manager">
           </div>
         </div>
 
         <div class="two-column">
           <div>
             <label>Email</label>
-            <input type="email" required>
+            <input type="email" id="contactEmail" required>
           </div>
 
           <div>
             <label>Phone Number</label>
-            <input type="tel">
+            <input type="tel" id="contactPhone">
           </div>
         </div>
       </section>
@@ -299,169 +282,134 @@
         <p class="small-note">Upload a logo to display with your job listings.</p>
 
         <div class="logo-upload">
-          <div class="logo-placeholder">🏢</div>
-          <input type="file" accept="image/*">
+          <div class="logo-placeholder" id="logoPreview">🏢</div>
+          <input type="file" id="companyLogo" accept="image/*">
         </div>
       </section>
 
       <section class="form-card">
         <h2>Company Description</h2>
-        <textarea rows="5" placeholder="Briefly describe the company, workplace culture, and what candidates should know."></textarea>
+        <textarea id="companyDescription" rows="5" placeholder="Briefly describe the company, workplace culture, and what candidates should know."></textarea>
       </section>
 
-      <button type="submit" class="submit-btn">Create Account & Continue</button>
-    </form>
-  </section>
+      <button type="submit" class="submit-btn">
+        Create Account
+      </button>
 
-  <!-- PAGE 2: JOB LISTING -->
-  <section id="jobListingPage" class="hidden">
-    <div class="page-header">
-      <h1>Create A Job Listing</h1>
-      <p>Add the job details, required skills, education requirements, and application deadline for candidates.</p>
-    </div>
-
-    <form class="form-box">
-      <section class="form-card">
-        <h2>Job Details</h2>
-
-        <div class="two-column">
-          <div>
-            <label>Job Title</label>
-            <input type="text" required>
-          </div>
-
-          <div>
-            <label>Job Type</label>
-            <select required>
-              <option value="">Select job type</option>
-              <option>Full-time</option>
-              <option>Part-time</option>
-              <option>Casual</option>
-              <option>Internship</option>
-              <option>Graduate Program</option>
-              <option>Contract</option>
-              <option>Remote</option>
-              <option>Hybrid</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="two-column">
-          <div>
-            <label>Location</label>
-            <input type="text" placeholder="Sydney, NSW">
-          </div>
-
-          <div>
-            <label>Experience Level</label>
-            <select>
-              <option value="">Select experience level</option>
-              <option>Entry Level</option>
-              <option>Graduate</option>
-              <option>Junior</option>
-              <option>Mid-level</option>
-              <option>Senior</option>
-            </select>
-          </div>
-        </div>
-
-        <label>Salary Range</label>
-        <div class="two-column">
-          <input type="number" placeholder="Minimum salary">
-          <input type="number" placeholder="Maximum salary">
-        </div>
-      </section>
-
-      <section class="form-card">
-        <h2>Required Skills</h2>
-
-        <div class="skill-tags">
-          <span>Problem Solving</span>
-          <span>HTML</span>
-        </div>
-
-        <select>
-          <option>Select required skill</option>
-          <option>JavaScript</option>
-          <option>Python</option>
-          <option>Java</option>
-          <option>C++</option>
-          <option>SQL</option>
-          <option>React</option>
-          <option>CSS</option>
-          <option>Communication</option>
-          <option>Teamwork</option>
-          <option>Leadership</option>
-          <option>Project Management</option>
-          <option>Data Analysis</option>
-          <option>UI/UX Design</option>
-          <option>Cloud Computing</option>
-        </select>
-      </section>
-
-      <section class="form-card">
-        <h2>Education Requirement</h2>
-
-        <label>Level</label>
-        <div class="skill-tags">
-          <span>Diploma</span>
-          <span>Bachelors</span>
-        </div>
-
-        <select>
-          <option>Select education level</option>
-          <option>Certificate</option>
-          <option>Diploma</option>
-          <option>Advanced Diploma</option>
-          <option>Bachelors Degree</option>
-          <option>Masters Degree</option>
-          <option>No formal requirement</option>
-        </select>
-
-        <label>Area</label>
-        <div class="skill-tags">
-          <span>IT</span>
-          <span>Web Design</span>
-          <span>Comp Sci</span>
-        </div>
-
-        <select>
-          <option>Select study area</option>
-          <option>Computer Science</option>
-          <option>Software Engineering</option>
-          <option>Information Technology</option>
-          <option>Data Science</option>
-          <option>Cyber Security</option>
-          <option>Business Information Systems</option>
-          <option>Engineering</option>
-          <option>Any relevant field</option>
-        </select>
-      </section>
-
-      <section class="form-card">
-        <h2>Job Description</h2>
-        <textarea rows="7" placeholder="Describe the role, responsibilities, expectations, and ideal candidate."></textarea>
-      </section>
-
-      <section class="form-card">
-        <h2>Application Deadline</h2>
-        <input type="date">
-      </section>
-
-      <button type="submit" class="submit-btn">Publish Job Listing</button>
     </form>
   </section>
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
-  function showJobListingPage(event) {
+  const supabaseClient = supabase.createClient(
+    "https://bzakjtfktgdlmmevbnfo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+  );
+
+  const COMPANY_BUCKET = "company-files";
+
+  document.getElementById("companyLogo").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        document.getElementById("logoPreview").innerHTML =
+          `<img src="${e.target.result}" alt="Company logo preview">`;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  });
+
+  async function uploadCompanyLogo(file) {
+    if (!file) return null;
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `logos/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { error } = await supabaseClient.storage
+      .from(COMPANY_BUCKET)
+      .upload(fileName, file);
+
+    if (error) {
+      console.error("Logo upload error:", error);
+      alert("Logo upload failed.");
+      return null;
+    }
+
+    const { data } = supabaseClient.storage
+      .from(COMPANY_BUCKET)
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function createCompanyAccount(event) {
     event.preventDefault();
 
-    document.getElementById("companyAccountPage").classList.add("hidden");
-    document.getElementById("jobListingPage").classList.remove("hidden");
+    const companyName = document.getElementById("companyName").value.trim();
+    const industry = document.getElementById("companyIndustry").value;
+    const website = document.getElementById("companyWebsite").value.trim();
+    const location = document.getElementById("companyLocation").value.trim();
+    const description = document.getElementById("companyDescription").value.trim();
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const contactName = document.getElementById("contactName").value.trim();
+    const contactPosition = document.getElementById("contactPosition").value.trim();
+    const contactEmail = document.getElementById("contactEmail").value.trim();
+    const contactPhone = document.getElementById("contactPhone").value.trim();
+
+    const logoFile = document.getElementById("companyLogo").files[0];
+
+    if (!companyName || !industry || !contactName || !contactEmail) {
+      alert("Please complete the required company and contact fields.");
+      return;
+    }
+
+    const logoUrl = await uploadCompanyLogo(logoFile);
+
+    const { data: company, error: companyError } = await supabaseClient
+      .from("company")
+      .insert([{
+        name: companyName,
+        industry: industry,
+        website: website,
+        location: location,
+        logo_url: logoUrl,
+        description: description
+      }])
+      .select()
+      .single();
+
+    if (companyError) {
+      console.error("Company insert error:", companyError);
+      alert("Error creating company account. Check if the company name already exists.");
+      return;
+    }
+
+    const { error: contactError } = await supabaseClient
+      .from("contact")
+      .insert([{
+        company_id: company.company_id,
+        full_name: contactName,
+        position: contactPosition,
+        email: contactEmail,
+        phone_number: contactPhone
+      }]);
+
+    if (contactError) {
+      console.error("Contact insert error:", contactError);
+      alert("Company was created, but contact details failed to save.");
+      return;
+    }
+
+    alert("Company account created successfully.");
+
+    window.location.href = `employer.html?id=${company.company_id}`;
   }
 </script>
 

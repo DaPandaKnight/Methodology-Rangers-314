@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Company Profile — TalentMatch</title>
+  <title>Candidate Profile — TalentMatch</title>
 
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
@@ -76,7 +76,7 @@
       border-bottom: 1px solid var(--border-md);
     }
 
-    .logo-box {
+    .photo-box {
       background: var(--green-bg);
       border-radius: 12px;
       padding: 22px;
@@ -84,13 +84,12 @@
       border: 1px dashed var(--border-md);
     }
 
-    .logo-box img {
+    .photo-box img {
       width: 180px;
       height: 180px;
-      object-fit: contain;
+      object-fit: cover;
       border-radius: 12px;
       background: white;
-      padding: 12px;
     }
 
     .placeholder {
@@ -116,19 +115,18 @@
       margin-bottom: 16px;
     }
 
-    .details {
+    .contact {
       color: var(--ink-soft);
       margin-bottom: 20px;
       line-height: 1.7;
     }
 
-    .description {
+    .blurb {
       background: #F7F5F1;
       border: 1px solid var(--border);
       padding: 18px;
       border-radius: 12px;
       color: var(--ink-soft);
-      line-height: 1.6;
     }
 
     .content-grid {
@@ -146,17 +144,22 @@
       margin-bottom: 14px;
     }
 
-    .entry strong {
-      display: block;
-      margin-bottom: 6px;
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .entry div {
-      color: var(--ink-soft);
-      margin-top: 4px;
+    .skill-tags span {
+      background: var(--green-bg);
+      color: var(--green);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid var(--green);
     }
 
-    .website-btn {
+    .resume-btn {
       display: inline-block;
       margin-top: 20px;
       background: var(--green);
@@ -165,26 +168,6 @@
       border-radius: 8px;
       text-decoration: none;
     }
-
-    .side-card {
-      background: #FFFEFC;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      height: fit-content;
-    }
-
-    .empty {
-      color: var(--ink-soft);
-      font-size: 14px;
-    }
-
-    @media (max-width: 850px) {
-      .top-section,
-      .content-grid {
-        grid-template-columns: 1fr;
-      }
-    }
   </style>
 </head>
 
@@ -192,65 +175,63 @@
 
 <nav>
   <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
- 
+  <a href="PhoneLogin.html" class="back-link">← Login</a>
 </nav>
 
 <main class="profile-page">
   <div class="profile-card">
 
     <section class="top-section">
-      <div class="logo-box" id="logoBox">
-        <div class="placeholder">🏢</div>
+      <div class="photo-box" id="photoBox">
+        <div class="placeholder">🖼️</div>
       </div>
 
       <div>
-        <h1 id="companyName">Loading...</h1>
+        <h1 id="name">Loading...</h1>
 
-        <div class="details">
-          <div id="industry"></div>
-          <div id="location"></div>
+        <div class="contact">
+          <div id="email"></div>
+          <div id="phone"></div>
         </div>
 
-        <div class="description" id="description">
-          Loading company profile...
-        </div>
+        <div class="blurb" id="blurb"></div>
 
-        <a id="website" class="website-btn" target="_blank" style="display:none;">
-          Visit Website
+        <a id="resume" class="resume-btn" target="_blank" style="display:none;">
+          Download Resume
         </a>
       </div>
     </section>
 
     <div class="content-grid">
       <div>
-        <h2>Employer Contact</h2>
-        <div id="contacts"></div>
+        <h2>Education</h2>
+        <div id="education"></div>
+
+        <h2>Experience</h2>
+        <div id="experience"></div>
       </div>
 
-      <div class="side-card">
-        <h2>Company Details</h2>
-        <div class="details">
-          <div id="companyId"></div>
-          <div id="createdAt"></div>
+      <div>
+        <h2>Preferred Location</h2>
+        <div class="skill-tags">
+          <span id="preferredLocation"></span>
         </div>
-      </div>
-    </div>
 
-    <div>
-        <h2>Job Listings</h2>
-        <div id="contacts"></div>
-      </div>
+         <br/>
 
-      <div class="side-card">
-        <h2>Jobs, Funcatioanility to be built, need to add in the database links</h2>
+        <h2>Preferred Mode</h2>
+        <div class="skill-tags">
+          <span id="workingMode"></span>
+        </div>
+
+        <br/>
+
+        <h2>Skills</h2>
+        <div class="skill-tags" id="skills"></div>
       </div>
-      <a href="Create A Job Listing.html"  class="website-btn" target="_blank"> Create a Job Listing</a>
-        
     </div>
 
   </div>
-
-  
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -261,94 +242,88 @@ const supabaseClient = supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
 );
 
+// Get ID from URL
 function getId() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
 }
 
-function formatDate(dateValue) {
-  if (!dateValue) return "";
-
-  return new Date(dateValue).toLocaleDateString("en-AU", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  });
-}
-
-async function loadCompanyProfile() {
+async function loadProfile() {
   const id = getId();
 
   if (!id) {
-    document.getElementById("companyName").textContent = "No company selected";
-    document.getElementById("description").textContent =
-      "Open this page using EmployerProfile.html?id=1";
+    alert("No profile ID found.");
     return;
   }
 
-  const { data: company, error: companyError } = await supabaseClient
-    .from("company")
+  // Candidate
+  const { data: candidate } = await supabaseClient
+    .from("candidate")
     .select("*")
-    .eq("company_id", id)
+    .eq("candidate_id", id)
     .single();
 
-  if (companyError || !company) {
-    console.error("Company load error:", companyError);
-    document.getElementById("companyName").textContent = "Company not found";
-    document.getElementById("description").textContent =
-      "Check that the company ID exists in Supabase.";
-    return;
+  document.getElementById("name").textContent = candidate.name;
+  document.getElementById("email").textContent = candidate.email;
+  document.getElementById("phone").textContent = candidate.phone;
+  document.getElementById("blurb").textContent = candidate.blurb;
+  
+  if (candidate.profile_photo_url) {
+    document.getElementById("photoBox").innerHTML =
+      `<img src="${candidate.profile_photo_url}">`;
   }
 
-  document.getElementById("companyName").textContent = company.name || "Unnamed Company";
-  document.getElementById("industry").textContent = company.industry || "";
-  document.getElementById("location").textContent = company.location || "";
-  document.getElementById("description").textContent =
-    company.description || "No company description added.";
-
-  document.getElementById("companyId").textContent = `Company ID: ${company.company_id}`;
-  document.getElementById("createdAt").textContent = company.created_at
-    ? `Created: ${formatDate(company.created_at)}`
-    : "";
-
-  if (company.logo_url) {
-    document.getElementById("logoBox").innerHTML =
-      `<img src="${company.logo_url}" alt="Company logo">`;
+  if (candidate.resume_url) {
+    const resume = document.getElementById("resume");
+    resume.href = candidate.resume_url;
+    resume.style.display = "inline-block";
   }
 
-  if (company.website) {
-    const website = document.getElementById("website");
-    website.href = company.website;
-    website.style.display = "inline-block";
-  }
-
-  loadContacts(company.company_id);
-}
-
-async function loadContacts(companyId) {
-  const { data: contacts, error } = await supabaseClient
-    .from("contact")
+  // Education
+  const { data: education } = await supabaseClient
+    .from("education")
     .select("*")
-    .eq("company_id", companyId);
+    .eq("candidate_id", id);
 
-  const contactsBox = document.getElementById("contacts");
+  document.getElementById("education").innerHTML =
+    education.map(e => `
+      <div class="entry">
+        <strong>${e.degree}</strong>
+        <div>${e.level}</div>
+      </div>
+    `).join("");
 
-  if (error || !contacts || contacts.length === 0) {
-    contactsBox.innerHTML = `<p class="empty">No employer contact added.</p>`;
-    return;
-  }
+  // Experience
+  const { data: experience } = await supabaseClient
+    .from("experience")
+    .select("*")
+    .eq("candidate_id", id);
 
-  contactsBox.innerHTML = contacts.map(contact => `
-    <div class="entry">
-      <strong>${contact.full_name || "Unnamed Contact"}</strong>
-      <div>${contact.position || ""}</div>
-      <div>${contact.email || ""}</div>
-      <div>${contact.phone_number || ""}</div>
-    </div>
-  `).join("");
+  document.getElementById("experience").innerHTML =
+    experience.map(e => `
+      <div class="entry">
+        <strong>${e.job_title}</strong>
+        <div>${e.company}</div>
+      </div>
+    `).join("");
+
+  // Skills
+  const { data: skills } = await supabaseClient
+    .from("skill")
+    .select("*")
+    .eq("candidate_id", id);
+
+  document.getElementById("skills").innerHTML =
+    skills.map(s => `<span>${s.skill_name}</span>`).join("");
+
+  document.getElementById("preferredLocation").textContent =
+  candidate.preferred_location || "Not specified";
+
+document.getElementById("workingMode").textContent =
+  candidate.working_mode || "Not specified";
 }
 
-loadCompanyProfile();
+loadProfile();
 </script>
 
 </body>

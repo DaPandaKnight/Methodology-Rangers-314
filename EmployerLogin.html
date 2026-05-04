@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — TalentMatch</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26,26,24,0.1);
+      --border-md: rgba(26,26,24,0.18);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-md);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: var(--ink-soft);
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-md);
+      background: #F7F5F1;
+      margin-bottom: 15px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: var(--green);
+      color: white;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .link {
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .link a {
+      color: var(--green);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+    <h1>Login</h1>
+    <p>Enter your Company Name to access your profile</p>
+
+    <input type="text" id="CompanyNameInput" placeholder="Enter your Company Name">
+
+    <button onclick="login()">Login</button>
+
+    <div class="link">
+      Don’t have a profile? <a href="candidate.html">Create one</a>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://bzakjtfktgdlmmevbnfo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+  );
+
+  async function login() {
+    const CompanyName = document.getElementById("CompanyNameInput").value.trim();
+
+    if (!phone) {
+      alert("Please enter your Company Name.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("company")
+      .select("company_id")
+      .eq("name", text)
+      .single();
+
+    if (error || !data) {
+      alert("No profile found with that name.");
+      return;
+    }
+
+    const companyId = data.company_id;
+
+    // Redirect to profile page
+    window.location.href = `CandidateProfile.html?id=${candidateId}`;
+  }
+</script>
+
+</body>
+</html>

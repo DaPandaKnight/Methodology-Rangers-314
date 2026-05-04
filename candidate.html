@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Profile — TalentMatch</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
@@ -123,6 +122,13 @@
       align-items: center;
       justify-content: center;
       font-size: 40px;
+      overflow: hidden;
+    }
+
+    .photo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     button {
@@ -195,6 +201,7 @@
       border-radius: 20px;
       font-size: 13px;
       border: 1px solid var(--green);
+      cursor: pointer;
     }
 
     .submit-btn {
@@ -219,8 +226,8 @@
 <body>
 
 <nav>
-  <a href="#" class="nav-logo">Talent<span>Match</span></a>
-  <a href="#" class="back-link">← Back</a>
+  <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+  <a href="CandidateProfile.html" class="back-link">Find Profile</a>
 </nav>
 
 <main class="profile-page">
@@ -234,19 +241,21 @@
 
     <section class="form-card top-section">
       <div class="photo-upload">
-        <div class="photo-placeholder">🖼️</div>
-        <input type="file" accept="image/*">
+        <div class="photo-placeholder" id="photoPreview">🖼️</div>
+
+        <label>Profile Photo</label>
+        <input type="file" id="profilePhoto" accept="image/*">
       </div>
 
       <div>
         <label>Full Name</label>
-        <input type="text">
+        <input type="text" id="fullName">
 
         <label>Email</label>
-        <input type="email">
+        <input type="email" id="email">
 
         <label>Phone Number</label>
-        <input type="tel">
+        <input type="tel" id="phone">
       </div>
     </section>
 
@@ -256,19 +265,19 @@
       <div id="educationContainer">
         <div class="entry-set">
           <label>Level of qualification</label>
-          <input type="text">
+          <input type="text" class="edu-level">
 
           <label>Qualification title</label>
-          <input type="text">
+          <input type="text" class="edu-degree">
 
           <div class="two-column">
             <div>
               <label>Start Date</label>
-              <input type="date">
+              <input type="date" class="edu-start">
             </div>
             <div>
               <label>Completion Date</label>
-              <input type="date">
+              <input type="date" class="edu-end">
             </div>
           </div>
         </div>
@@ -283,19 +292,19 @@
       <div id="experienceContainer">
         <div class="entry-set">
           <label>Job title</label>
-          <input type="text">
+          <input type="text" class="exp-title">
 
           <label>Company Name</label>
-          <input type="text">
+          <input type="text" class="exp-company">
 
           <div class="two-column">
             <div>
               <label>Start Date</label>
-              <input type="date">
+              <input type="date" class="exp-start">
             </div>
             <div>
               <label>End Date</label>
-              <input type="date">
+              <input type="date" class="exp-end">
             </div>
           </div>
         </div>
@@ -307,32 +316,49 @@
     <section class="form-card">
       <h2>Skills</h2>
 
-      <div class="skill-tags">
-        <span>Problem Solving</span>
-        <span>HTML</span>
-      </div>
+      <div class="skill-tags" id="skillTags"></div>
 
-      <select>
-        <option>Select skill</option>
-        <option>JavaScript</option>
-        <option>Python</option>
-        <option>Java</option>
-        <option>C++</option>
-        <option>SQL</option>
-        <option>React</option>
-        <option>CSS</option>
-        <option>Communication</option>
-        <option>Teamwork</option>
-        <option>Leadership</option>
-        <option>Time Management</option>
-        <option>Critical Thinking</option>
-        <option>Project Management</option>
+      <div class="two-column">
+        <select id="skillSelect">
+          <option value="">Select skill</option>
+          <option>JavaScript</option>
+          <option>Python</option>
+          <option>Java</option>
+          <option>C++</option>
+          <option>SQL</option>
+          <option>React</option>
+          <option>CSS</option>
+          <option>Communication</option>
+          <option>Teamwork</option>
+          <option>Leadership</option>
+          <option>Time Management</option>
+          <option>Critical Thinking</option>
+          <option>Project Management</option>
+        </select>
+
+        <button type="button" onclick="addSkill()">+ Add Skill</button>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Preferred Working Mode</h2>
+
+      <select id="workModeSelect">
+        <option value="">Select Mode</option>
+        <option value="Remote">Remote</option>
+        <option value="On-site">On-site</option>
+        <option value="Hybrid">Hybrid</option>
       </select>
     </section>
 
     <section class="form-card">
-      <h2>Personal Blurb (optional)</h2>
-      <textarea rows="5"></textarea>
+      <h2>Preferred Location</h2>
+      <input type="text" id="LocationSelect" placeholder="Enter a location">
+    </section>
+
+    <section class="form-card">
+      <h2>Personal Blurb</h2>
+      <textarea id="blurb" rows="5"></textarea>
     </section>
 
     <section class="form-card">
@@ -340,16 +366,42 @@
       <p style="color: var(--ink-soft); font-size: 14px;">Upload your resume as a PDF or Word document.</p>
 
       <div class="resume-upload">
-        <input type="file" accept=".pdf,.doc,.docx">
+        <input type="file" id="resumeFile" accept=".pdf,.doc,.docx">
       </div>
     </section>
 
-    <button class="submit-btn">Create Profile</button>
+    <button type="button" class="submit-btn" onclick="submitProfile()">
+      Create Profile
+    </button>
 
   </form>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script>
+  const supabaseClient = supabase.createClient(
+    "https://bzakjtfktgdlmmevbnfo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+  );
+
+  const STORAGE_BUCKET = "candidate-files";
+
+  document.getElementById("profilePhoto").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        document.getElementById("photoPreview").innerHTML =
+          `<img src="${e.target.result}" alt="Profile photo preview">`;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  });
+
   function addEducation() {
     const container = document.getElementById("educationContainer");
 
@@ -358,19 +410,19 @@
 
     newEducation.innerHTML = `
       <label>Level of qualification</label>
-      <input type="text">
+      <input type="text" class="edu-level">
 
       <label>Qualification title</label>
-      <input type="text">
+      <input type="text" class="edu-degree">
 
       <div class="two-column">
         <div>
           <label>Start Date</label>
-          <input type="date">
+          <input type="date" class="edu-start">
         </div>
         <div>
           <label>Completion Date</label>
-          <input type="date">
+          <input type="date" class="edu-end">
         </div>
       </div>
     `;
@@ -386,24 +438,183 @@
 
     newExperience.innerHTML = `
       <label>Job title</label>
-      <input type="text">
+      <input type="text" class="exp-title">
 
       <label>Company Name</label>
-      <input type="text">
+      <input type="text" class="exp-company">
 
       <div class="two-column">
         <div>
           <label>Start Date</label>
-          <input type="date">
+          <input type="date" class="exp-start">
         </div>
         <div>
           <label>End Date</label>
-          <input type="date">
+          <input type="date" class="exp-end">
         </div>
       </div>
     `;
 
     container.appendChild(newExperience);
+  }
+
+  function addSkill() {
+    const skillSelect = document.getElementById("skillSelect");
+    const skillTags = document.getElementById("skillTags");
+    const selectedSkill = skillSelect.value;
+
+    if (selectedSkill === "") {
+      alert("Please select a skill first.");
+      return;
+    }
+
+    const existingSkills = Array.from(skillTags.querySelectorAll("span"))
+      .map(skill => skill.innerText.replace(" ×", ""));
+
+    if (existingSkills.includes(selectedSkill)) {
+      alert("This skill has already been added.");
+      return;
+    }
+
+    const skillTag = document.createElement("span");
+    skillTag.innerHTML = `${selectedSkill} ×`;
+
+    skillTag.onclick = function () {
+      skillTag.remove();
+    };
+
+    skillTags.appendChild(skillTag);
+    skillSelect.value = "";
+  }
+
+  
+  async function uploadFile(file, folderName) {
+    if (!file) return null;
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${folderName}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { error } = await supabaseClient.storage
+      .from(STORAGE_BUCKET)
+      .upload(fileName, file);
+
+    if (error) {
+      console.error(error);
+      alert("File upload failed.");
+      return null;
+    }
+
+    const { data } = supabaseClient.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function submitProfile() {
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const blurb = document.getElementById("blurb").value.trim();
+    const workMode = document.getElementById("workModeSelect").value;
+    const preferredLocation = document.getElementById("LocationSelect").value.trim();
+
+    if (!name || !email || !phone) {
+      alert("Please enter your name, email, and phone number.");
+      return;
+    }
+
+    const profilePhoto = document.getElementById("profilePhoto").files[0];
+    const resumeFile = document.getElementById("resumeFile").files[0];
+
+    const profilePhotoUrl = await uploadFile(profilePhoto, "profile-photos");
+    const resumeUrl = await uploadFile(resumeFile, "resumes");
+
+    const { data: candidate, error } = await supabaseClient
+      .from("candidate")
+      .insert([{
+        name,
+        email,
+        phone,
+        blurb,
+        profile_photo_url: profilePhotoUrl,
+        resume_url: resumeUrl, 
+        working_mode: workMode,
+        preferred_location: preferredLocation
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      alert("Error saving profile. Check if this email or phone already exists.");
+      return;
+    }
+
+    const candidateId = candidate.candidate_id;
+
+    const educationData = [];
+
+    document.querySelectorAll("#educationContainer .entry-set").forEach(e => {
+      const level = e.querySelector(".edu-level").value.trim();
+      const degree = e.querySelector(".edu-degree").value.trim();
+      const startDate = e.querySelector(".edu-start").value || null;
+      const endDate = e.querySelector(".edu-end").value || null;
+
+      if (level || degree || startDate || endDate) {
+        educationData.push({
+          candidate_id: candidateId,
+          level,
+          degree,
+          start_date: startDate,
+          end_date: endDate
+        });
+      }
+    });
+
+    if (educationData.length > 0) {
+      await supabaseClient.from("education").insert(educationData);
+    }
+
+    const experienceData = [];
+
+    document.querySelectorAll("#experienceContainer .entry-set").forEach(e => {
+      const jobTitle = e.querySelector(".exp-title").value.trim();
+      const company = e.querySelector(".exp-company").value.trim();
+      const startDate = e.querySelector(".exp-start").value || null;
+      const endDate = e.querySelector(".exp-end").value || null;
+
+      if (jobTitle || company || startDate || endDate) {
+        experienceData.push({
+          candidate_id: candidateId,
+          job_title: jobTitle,
+          company,
+          start_date: startDate,
+          end_date: endDate
+        });
+      }
+    });
+
+    if (experienceData.length > 0) {
+      await supabaseClient.from("experience").insert(experienceData);
+    }
+
+    const skillData = [];
+
+    document.querySelectorAll("#skillTags span").forEach(s => {
+      skillData.push({
+        candidate_id: candidateId,
+        skill_name: s.innerText.replace(" ×", "")
+      });
+    });
+
+    if (skillData.length > 0) {
+      await supabaseClient.from("skill").insert(skillData);
+    }
+
+    alert(`Profile created successfully! Your Profile ID is ${candidateId}`);
+
+    window.location.href = `CandidateProfile.html?id=${candidateId}`;
   }
 </script>
 

@@ -407,46 +407,82 @@
   <!-- Candidate Login / Create Account Popup -->
   <div class="modal-overlay" id="candidateModal" onclick="closeCandidateModal(event)">
     <div class="modal-box">
-      <button class="modal-close" onclick="closeCandidateModal()">×</button>
+      <button class="modal-close" onclick="closeCandidateModal()"> × </button>
 
       <div class="modal-icon">🎓</div>
       <h2>Candidate Portal</h2>
       <p>Log in to view your profile and recommendations, or create an account to get started.</p>
 
       <div class="modal-actions">
-        <a href="candidate-login.html" class="modal-btn secondary">Log in</a>
+        <a href="LoginCandidate.html" class="modal-btn secondary">Log in</a>
         <a href="Candidate.html" class="modal-btn primary">Create an account</a>
       </div>
     </div>
   </div>
 
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-eyebrow">Intelligent Matching Platform</div>
-    <h1>Find the right fit,<br><em>faster</em></h1>
-    <p>Two-way intelligent matching that connects the right candidates with the right opportunities — no endless scrolling required.</p>
+ <!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow">Intelligent Matching Platform</div>
+  <h1>Find the right fit,<br><em>faster</em></h1>
+  <p>Two-way intelligent matching that connects the right candidates with the right opportunities — no endless scrolling required.</p>
 
-    <div class="portal-grid">
-      <a href="#" class="portal-card candidate" onclick="openCandidateModal(event)">
-        <div class="portal-icon">🎓</div>
-        <div>
-          <h2>I'm a Candidate</h2>
-          <p>Create a profile, browse open roles, and get personalised job recommendations matched to your skills and experience.</p>
-        </div>
-        <div class="portal-cta">Find opportunities →</div>
-      </a>
+  <div class="portal-grid">
 
-      <a href="employer.html" class="portal-card employer">
-        <div class="portal-icon">🏢</div>
-        <div>
-          <h2>I'm an Employer</h2>
-          <p>Post job listings, search candidate profiles, and receive intelligent recommendations for your open roles.</p>
-        </div>
-        <div class="portal-cta" style="color:var(--green)">Find candidates →</div>
-      </a>
+    <!-- Candidate Card -->
+    <a href="#" class="portal-card candidate" onclick="openCandidateModal(event)">
+      <div class="portal-icon">🎓</div>
+      <div>
+        <h2>I'm a Candidate</h2>
+        <p>Create a profile, browse open roles, and get personalised job recommendations matched to your skills and experience.</p>
+      </div>
+      <div class="portal-cta">Find opportunities →</div>
+    </a>
+
+    <!-- Employer Card -->
+    <a href="#" class="portal-card employer" onclick="openEmployerModal(event)">
+      <div class="portal-icon">🏢</div>
+      <div>
+        <h2>I'm an Employer</h2>
+        <p>Post job listings, search candidate profiles, and receive intelligent recommendations for your open roles.</p>
+      </div>
+      <div class="portal-cta" style="color:var(--green)">Find candidates →</div>
+    </a>
+
+  </div>
+</section>
+
+<!-- Candidate Modal -->
+<div class="modal-overlay" id="CandidateModal" onclick="closeCandidateModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCandidateModal()">×</button>
+
+    <div class="modal-icon">🎓</div>
+    <h2>Candidate Portal</h2>
+    <p>Log in to view your profile and recommendations, or create a profile to get started.</p>
+
+    <div class="modal-actions">
+      <a href="PhoneLogin.html" class="modal-btn secondary">Log in</a>
+      <a href="candidate.html" class="modal-btn primary">Create Profile</a>
     </div>
-  </section>
+  </div>
+</div>
+
+<!-- Employer Modal -->
+<div class="modal-overlay" id="EmployerModal" onclick="closeEmployerModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEmployerModal()">×</button>
+
+    <div class="modal-icon">🏢</div>
+    <h2>Employer Portal</h2>
+    <p>Log in to manage job listings, or create an employer account to get started.</p>
+
+    <div class="modal-actions">
+      <a href="EmployerLogin.html" class="modal-btn secondary">Log in</a>
+      <a href="Create a Employer Account.html" class="modal-btn primary">Create an account</a>
+    </div>
+  </div>
+</div>
 
   <!-- Section divider -->
   <div class="section-divider">
@@ -485,6 +521,17 @@
     function closeCandidateModal(event) {
       if (!event || event.target.id === 'candidateModal' || event.target.classList.contains('modal-close')) {
         document.getElementById('candidateModal').classList.remove('active');
+      }
+    }
+
+     function openEmployerModal(event) {
+      event.preventDefault();
+      document.getElementById('EmployerModal').classList.add('active');
+    }
+
+    function closeEmployerModal(event) {
+      if (!event || event.target.id === 'EmployerModal' || event.target.classList.contains('modal-close')) {
+        document.getElementById('EmployerModal').classList.remove('active');
       }
     }
 

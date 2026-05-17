@@ -527,7 +527,7 @@
         <div class="dashboard-icon">📝</div>
         <h2>Create Job Listing</h2>
         <p>Add a new job listing so candidates can find and apply for your open positions.</p>
-        <a href="CreateJobListing.html">Create listing →</a>
+        <a id="createJobListingLink" href="#">Create Job Listing</a>
       </div>
 
 
@@ -561,21 +561,24 @@
     // Get the company ID saved from EmployerLogin.html
     const companyId = localStorage.getItem("companyId");
 
-    // Connect profile buttons/links to the correct employer profile
+    const createJobListingLink = document.getElementById("createJobListingLink");
     const employerProfileBtn = document.getElementById("employerProfileBtn");
     const companyProfileCardLink = document.getElementById("companyProfileCardLink");
 
     if (companyId) {
-      employerProfileBtn.href = `employer.html?id=${companyId}`;
-      companyProfileCardLink.href = `employer.html?id=${companyId}`;
+        createJobListingLink.href = `CreateJobListing.html?company_id=${companyId}`;
+        employerProfileBtn.href = `employer.html?id=${companyId}`;
+        companyProfileCardLink.href = `employer.html?id=${companyId}`;
     } else {
-      employerProfileBtn.href = "EmployerLogin.html";
-      companyProfileCardLink.href = "EmployerLogin.html";
+        createJobListingLink.href = "EmployerLogin.html";
+        employerProfileBtn.href = "EmployerLogin.html";
+        companyProfileCardLink.href = "EmployerLogin.html";
+        console.error("No companyId found in localStorage.");
     }
 
     function logout() {
-      localStorage.removeItem("companyId");
-      window.location.href = "EmployerLogin.html";
+        localStorage.removeItem("companyId");
+        window.location.href = "EmployerLogin.html";
     }
 
     const candidates = [
@@ -706,6 +709,8 @@
       `).join("");
     }
 
+    
+
     document.querySelectorAll(".filter-btn").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
@@ -721,6 +726,7 @@
     });
 
     renderCandidates();
+
   </script>
 
 </body>

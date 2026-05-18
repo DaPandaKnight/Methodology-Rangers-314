@@ -397,9 +397,6 @@
   <!-- Nav -->
   <nav>
     <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
-    <div class="nav-links">
-      <a href="#" class="btn-nav">Sign in</a>
-    </div>
   </nav>
 
   <!-- Candidate Login / Create Account Popup -->
@@ -481,34 +478,6 @@
     </div>
   </div>
 </div>
-
-  <!-- Section divider -->
-  <div class="section-divider">
-    <span>Open positions</span>
-  </div>
-
-  <!-- Job Listings -->
-  <section class="listings-section">
-    <div class="listings-header">
-      <div>
-        <h2>Latest job listings</h2>
-        <p id="results-count">Showing all open positions</p>
-      </div>
-    </div>
-
-    <!-- Search & filters -->
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Search by keyword, title, or skill…" />
-      <button class="filter-btn active" data-mode="All">All</button>
-      <button class="filter-btn" data-mode="Remote">Remote</button>
-      <button class="filter-btn" data-mode="Hybrid">Hybrid</button>
-      <button class="filter-btn" data-mode="On-site">On-site</button>
-    </div>
-
-    <!-- Cards -->
-    <div class="job-grid" id="job-grid"></div>
-  </section>
-
   <script>
 
     function openCandidateModal(event) {
@@ -538,150 +507,6 @@
         document.getElementById('candidateModal').classList.remove('active');
       }
     });
-
-    // ── Sample job data (mirrors the seed data in schema.sql) ──
-    const jobs = [
-      {
-        id: 1,
-        title: "Junior Frontend Developer",
-        company: "TechCorp Australia",
-        emoji: "💻",
-        description: "We are looking for a motivated junior frontend developer to join our growing team. You will build responsive web interfaces using React and collaborate closely with backend engineers.",
-        education: "Bachelor's Degree",
-        skills: ["React", "JavaScript", "CSS", "Git"],
-        yearsExp: 1,
-        mode: "Hybrid",
-        location: "Sydney, NSW",
-        posted: "2 days ago"
-      },
-      {
-        id: 2,
-        title: "Data Analyst",
-        company: "TechCorp Australia",
-        emoji: "📊",
-        description: "Analyse large datasets to generate business insights. Work closely with product and engineering teams to drive data-informed decisions across the organisation.",
-        education: "Bachelor's Degree",
-        skills: ["Python", "SQL", "Pandas", "Tableau"],
-        yearsExp: 2,
-        mode: "Remote",
-        location: "Sydney, NSW",
-        posted: "3 days ago"
-      },
-      {
-        id: 3,
-        title: "Backend Engineer",
-        company: "TechCorp Australia",
-        emoji: "⚙️",
-        description: "Design and maintain scalable backend services. Experience with microservices architecture and containerisation required. Join a senior engineering team working on enterprise software.",
-        education: "Bachelor's Degree",
-        skills: ["Java", "Spring Boot", "Docker", "PostgreSQL"],
-        yearsExp: 4,
-        mode: "On-site",
-        location: "Melbourne, VIC",
-        posted: "5 days ago"
-      },
-      {
-        id: 4,
-        title: "Full Stack Developer",
-        company: "WebCo",
-        emoji: "🌐",
-        description: "Own features end-to-end across our React frontend and Node.js backend. Join a fast-moving team building consumer-facing web products for clients across Australia.",
-        education: "Bachelor's Degree",
-        skills: ["React", "Node.js", "SQL", "REST APIs"],
-        yearsExp: 3,
-        mode: "Hybrid",
-        location: "Brisbane, QLD",
-        posted: "1 week ago"
-      },
-      {
-        id: 5,
-        title: "UI/UX Designer",
-        company: "WebCo",
-        emoji: "🎨",
-        description: "Create intuitive and beautiful user experiences. You will run user research sessions, produce wireframes and high-fidelity mockups, and collaborate closely with developers.",
-        education: "Bachelor's Degree",
-        skills: ["Figma", "User Research", "Prototyping", "CSS"],
-        yearsExp: 2,
-        mode: "Remote",
-        location: "Remote",
-        posted: "1 week ago"
-      }
-    ];
-
-    let activeMode = 'All';
-    let searchQuery = '';
-
-    function renderJobs() {
-      const grid = document.getElementById('job-grid');
-      const count = document.getElementById('results-count');
-
-      const filtered = jobs.filter(j => {
-        const modeMatch = activeMode === 'All' || j.mode === activeMode;
-        const q = searchQuery.toLowerCase();
-        const textMatch = !q ||
-          j.title.toLowerCase().includes(q) ||
-          j.description.toLowerCase().includes(q) ||
-          j.skills.some(s => s.toLowerCase().includes(q)) ||
-          j.company.toLowerCase().includes(q);
-        return modeMatch && textMatch;
-      });
-
-      count.textContent = filtered.length === jobs.length
-        ? `Showing all ${jobs.length} open positions`
-        : `${filtered.length} of ${jobs.length} positions`;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><p>🔍</p><p>No jobs match your search.</p></div>`;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(j => `
-        <div class="job-card" onclick="alert('Job detail page coming in Iteration 2!')">
-          <div class="job-card-top">
-            <div>
-              <div class="job-title">${j.title}</div>
-              <div class="company-name">${j.company}</div>
-            </div>
-            <div class="company-logo">${j.emoji}</div>
-          </div>
-
-          <div class="job-meta">
-            <span class="badge badge-mode-${j.mode.replace(' ','-')}">${j.mode}</span>
-            <span class="badge badge-location">📍 ${j.location}</span>
-            <span class="badge badge-exp">⏱ ${j.yearsExp}+ yr${j.yearsExp !== 1 ? 's' : ''}</span>
-          </div>
-
-          <p class="job-desc">${j.description}</p>
-
-          <div class="skill-tags">
-            ${j.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
-          </div>
-
-          <div class="job-card-footer">
-            <span class="posted-date">Posted ${j.posted}</span>
-            <button class="btn-apply" onclick="event.stopPropagation(); alert('Apply flow coming in Iteration 2!')">View role</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Filter buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeMode = btn.dataset.mode;
-        renderJobs();
-      });
-    });
-
-    // Search
-    document.getElementById('search-input').addEventListener('input', e => {
-      searchQuery = e.target.value;
-      renderJobs();
-    });
-
-    renderJobs();
   </script>
 </body>
 </html>

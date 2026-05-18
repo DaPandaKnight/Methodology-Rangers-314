@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Company Profile — TalentMatch</title>
 
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
 
     :root {
       --bg: #F4F1EC;
@@ -38,6 +43,7 @@
       align-items: center;
       padding: 0 2rem;
       height: 60px;
+      z-index: 20;
     }
 
     .nav-logo {
@@ -47,12 +53,47 @@
       color: var(--ink);
     }
 
-    .nav-logo span { color: var(--green); }
+    .nav-logo span { 
+      color: var(--green); 
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
     .back-link {
       font-size: 14px;
       color: var(--ink-soft);
       text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--green);
+    }
+
+    .membership-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .membership-btn:hover {
+      opacity: 0.88;
+    }
+
+    .membership-btn.active {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+      cursor: default;
     }
 
     .profile-page {
@@ -180,9 +221,22 @@
     }
 
     @media (max-width: 850px) {
+      nav {
+        padding: 0 1rem;
+      }
+
       .top-section,
       .content-grid {
         grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .membership-btn {
+        padding: 7px 12px;
+        font-size: 13px;
       }
     }
   </style>
@@ -192,7 +246,14 @@
 
 <nav>
   <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
- 
+
+  <div class="nav-actions">
+    <button id="membershipBtn" class="membership-btn" onclick="becomeCompanyMember()">
+      Become a Member
+    </button>
+
+    <a id="backLink" href="EmployerHome.html" class="back-link">← Employer Home</a>
+  </div>
 </nav>
 
 <main class="profile-page">
@@ -225,6 +286,13 @@
       <div>
         <h2>Employer Contact</h2>
         <div id="contacts"></div>
+
+        <br />
+
+        <h2>Job Listings</h2>
+        <div id="jobListings">
+          <p class="empty">Job listing display can be added here later.</p>
+        </div>
       </div>
 
       <div class="side-card">
@@ -236,21 +304,7 @@
       </div>
     </div>
 
-    <div>
-        <h2>Job Listings</h2>
-        <div id="contacts"></div>
-      </div>
-
-      <div class="side-card">
-        <h2>Jobs, Funcatioanility to be built, need to add in the database links</h2>
-      </div>
-      <a href="Create A Job Listing.html"  class="website-btn" target="_blank"> Create a Job Listing</a>
-        
-    </div>
-
   </div>
-
-  
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -263,7 +317,71 @@ const supabaseClient = supabase.createClient(
 
 function getId() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("id");
+  const idFromUrl = params.get("id");
+  const idFromStorage = localStorage.getItem("companyId");
+
+  return idFromUrl || idFromStorage;
+}
+
+function setMembershipButtonAsMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "You are a Member";
+  membershipBtn.classList.add("active");
+  membershipBtn.disabled = true;
+}
+
+function setMembershipButtonAsNonMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "Become a Member";
+  membershipBtn.classList.remove("active");
+  membershipBtn.disabled = false;
+}
+
+async function loadCompanyMembershipStatus() {
+  const companyId = getId();
+
+  if (!companyId) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("company")
+    .select("is_member")
+    .eq("company_id", companyId)
+    .single();
+
+  if (error) {
+    console.error("Error loading membership status:", error);
+    return;
+  }
+
+  if (data.is_member === true) {
+    setMembershipButtonAsMember();
+  } else {
+    setMembershipButtonAsNonMember();
+  }
+}
+
+async function becomeCompanyMember() {
+  const companyId = getId();
+
+  if (!companyId) {
+    alert("No company profile ID found.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("company")
+    .update({ is_member: true })
+    .eq("company_id", companyId);
+
+  if (error) {
+    console.error("Error updating membership:", error);
+    alert("Could not activate membership.");
+    return;
+  }
+
+  setMembershipButtonAsMember();
 }
 
 function formatDate(dateValue) {
@@ -282,9 +400,12 @@ async function loadCompanyProfile() {
   if (!id) {
     document.getElementById("companyName").textContent = "No company selected";
     document.getElementById("description").textContent =
-      "Open this page using EmployerProfile.html?id=1";
+      "Open this page using employer.html?id=1 or log in as an employer.";
     return;
   }
+
+  const backLink = document.getElementById("backLink");
+  backLink.href = `EmployerHome.html?company_id=${id}`;
 
   const { data: company, error: companyError } = await supabaseClient
     .from("company")
@@ -349,6 +470,7 @@ async function loadContacts(companyId) {
 }
 
 loadCompanyProfile();
+loadCompanyMembershipStatus();
 </script>
 
 </body>

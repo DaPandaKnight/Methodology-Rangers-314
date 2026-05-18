@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Create Job Listing — TalentMatch</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -84,6 +88,35 @@
       line-height: 1.6;
     }
 
+    .company-preview {
+      background: var(--green-bg);
+      border: 1px solid rgba(26,127,90,0.25);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 26px;
+    }
+
+    .company-preview h2 {
+      margin-bottom: 10px;
+    }
+
+    .company-preview p {
+      color: var(--ink-soft);
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    .company-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--border-md);
+      background: white;
+      margin-bottom: 12px;
+      display: none;
+    }
+
     .job-form {
       background: var(--bg-card);
       border: 1px solid var(--border-md);
@@ -133,6 +166,9 @@
     .tag-area {
       margin-bottom: 10px;
       min-height: 34px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .tag-area:empty::before {
@@ -140,12 +176,6 @@
       color: var(--ink-soft);
       font-size: 13px;
       opacity: 0.75;
-    }
-
-    .tag-area {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
     }
 
     .tag-area span {
@@ -205,6 +235,28 @@
       margin-top: 8px;
     }
 
+    .message {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.success {
+      display: block;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .message.error {
+      display: block;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
     @media (max-width: 768px) {
       .two-column {
         grid-template-columns: 1fr;
@@ -221,38 +273,41 @@
 
 <nav>
   <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
-  <a href="employer-account.html" class="back-link">← Back to company account</a>
+  <a id="backLink" href="employer-account.html" class="back-link">← Back to company account</a>
 </nav>
 
 <main class="page">
 
   <div class="page-header">
     <h1>Create A Job Listing</h1>
-    <p>Add the role details, required skills, education requirements, and application deadline so candidates can apply.</p>
+    <p>Add the role details, required skills, education requirements, and job information so candidates can view and apply.</p>
   </div>
 
-  <form class="job-form">
+  <section class="company-preview">
+    <img id="companyLogo" class="company-logo" alt="Company logo" />
+    <h2 id="companyName">Loading company...</h2>
+    <p><strong>Industry:</strong> <span id="companyIndustry">Loading...</span></p>
+    <p><strong>Location:</strong> <span id="companyLocation">Loading...</span></p>
+    <p id="companyDescription"></p>
+  </section>
+
+  <form class="job-form" id="jobListingForm">
 
     <section class="form-card">
       <h2>Job Details</h2>
 
       <div class="two-column">
         <div>
-          <label>Job Title</label>
-          <input type="text" placeholder="e.g. Junior Web Developer" required>
+          <label for="jobTitle">Job Title</label>
+          <input type="text" id="jobTitle" placeholder="e.g. Junior Web Developer" required>
         </div>
 
         <div>
-          <label>Job Type</label>
-          <select required>
-            <option value="">Select job type</option>
-            <option>Full-time</option>
-            <option>Part-time</option>
-            <option>Casual</option>
-            <option>Internship</option>
-            <option>Graduate Program</option>
-            <option>Contract</option>
+          <label for="workMode">Work Mode</label>
+          <select id="workMode" required>
+            <option value="">Select work mode</option>
             <option>Remote</option>
+            <option>On-site</option>
             <option>Hybrid</option>
           </select>
         </div>
@@ -260,27 +315,14 @@
 
       <div class="two-column">
         <div>
-          <label>Location</label>
-          <input type="text" placeholder="e.g. Sydney, NSW">
+          <label for="jobLocation">Job Location</label>
+          <input type="text" id="jobLocation" placeholder="e.g. Sydney, NSW" required>
         </div>
 
         <div>
-          <label>Experience Level</label>
-          <select>
-            <option value="">Select experience level</option>
-            <option>Entry Level</option>
-            <option>Graduate</option>
-            <option>Junior</option>
-            <option>Mid-level</option>
-            <option>Senior</option>
-          </select>
+          <label for="yearsExperience">Years of Experience</label>
+          <input type="number" id="yearsExperience" min="0" placeholder="e.g. 2" required>
         </div>
-      </div>
-
-      <label>Salary Range</label>
-      <div class="two-column">
-        <input type="number" placeholder="Minimum salary">
-        <input type="number" placeholder="Maximum salary">
       </div>
     </section>
 
@@ -317,7 +359,7 @@
     <section class="form-card">
       <h2>Education Requirement</h2>
 
-      <label>Level</label>
+      <label for="educationLevelSelect">Level</label>
       <div class="tag-area" id="educationLevelTags"></div>
 
       <select id="educationLevelSelect">
@@ -333,7 +375,7 @@
 
       <button type="button" class="add-btn" onclick="addTag('educationLevelSelect', 'educationLevelTags')">+ Add level</button>
 
-      <label>Area</label>
+      <label for="educationAreaSelect">Area</label>
       <div class="tag-area" id="educationAreaTags"></div>
 
       <select id="educationAreaSelect">
@@ -352,25 +394,44 @@
       </select>
 
       <button type="button" class="add-btn" onclick="addTag('educationAreaSelect', 'educationAreaTags')">+ Add area</button>
-        <p class="helper-text">The bubbles above are created when the user adds a selected option.</p>
+      <p class="helper-text">The bubbles above are created when the user adds a selected option.</p>
     </section>
 
     <section class="form-card">
       <h2>Job Description</h2>
-      <textarea rows="7" placeholder="Describe the role, responsibilities, expectations, and ideal candidate."></textarea>
-    </section>
-
-    <section class="form-card">
-      <h2>Application Deadline</h2>
-      <input type="date">
+      <textarea id="jobDescription" rows="7" placeholder="Describe the role, responsibilities, expectations, and ideal candidate." required></textarea>
     </section>
 
     <button type="submit" class="submit-btn">Publish Job Listing</button>
+
+    <div id="message" class="message"></div>
 
   </form>
 </main>
 
 <script>
+  const SUPABASE_URL = "https://bzakjtfktgdlmmevbnfo.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let companyData = null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const companyId = urlParams.get("company_id");
+
+  const backLink = document.getElementById("backLink");
+
+  if (companyId) {
+    backLink.href = `employer-account.html?company_id=${companyId}`;
+  }
+
+  function showMessage(text, type) {
+    const message = document.getElementById("message");
+    message.textContent = text;
+    message.className = `message ${type}`;
+  }
+
   function addTag(selectId, tagContainerId) {
     const select = document.getElementById(selectId);
     const selectedValue = select.value;
@@ -386,6 +447,7 @@
     const newTag = document.createElement("span");
     newTag.textContent = selectedValue;
     newTag.title = "Click to remove";
+
     newTag.onclick = function () {
       newTag.remove();
     };
@@ -393,6 +455,119 @@
     tagContainer.appendChild(newTag);
     select.value = "";
   }
+
+  function getTagsAsText(tagContainerId) {
+    const tagContainer = document.getElementById(tagContainerId);
+
+    return Array.from(tagContainer.querySelectorAll("span"))
+      .map(tag => tag.textContent.trim())
+      .join(", ");
+  }
+
+  async function loadCompanyDetails() {
+    if (!companyId) {
+      showMessage("No company ID found. Please log in as an employer first.", "error");
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("company")
+      .select("*")
+      .eq("company_id", companyId)
+      .single();
+
+    if (error) {
+      console.error("Error loading company:", error);
+      showMessage("Could not load company details.", "error");
+      return;
+    }
+
+    companyData = data;
+
+    document.getElementById("companyName").textContent = data.name || "Company name not provided";
+    document.getElementById("companyIndustry").textContent = data.industry || "Not provided";
+    document.getElementById("companyLocation").textContent = data.location || "Not provided";
+    document.getElementById("companyDescription").textContent = data.description || "";
+
+    const companyLogo = document.getElementById("companyLogo");
+
+    if (data.logo_url) {
+      companyLogo.src = data.logo_url;
+      companyLogo.style.display = "block";
+    }
+  }
+
+  document.getElementById("jobListingForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    if (!companyData) {
+      showMessage("Company details have not loaded yet.", "error");
+      return;
+    }
+
+    const jobTitle = document.getElementById("jobTitle").value.trim();
+    const jobDescription = document.getElementById("jobDescription").value.trim();
+    const jobLocation = document.getElementById("jobLocation").value.trim();
+    const yearsExperience = Number(document.getElementById("yearsExperience").value);
+    const workMode = document.getElementById("workMode").value;
+
+    const requiredSkills = getTagsAsText("skillTags");
+
+    const educationLevels = getTagsAsText("educationLevelTags");
+    const educationAreas = getTagsAsText("educationAreaTags");
+
+    const requiredEducation = [
+      educationLevels,
+      educationAreas
+    ].filter(item => item !== "").join(" - ");
+
+    if (requiredSkills === "") {
+      showMessage("Please add at least one required skill.", "error");
+      return;
+    }
+
+    if (requiredEducation === "") {
+      showMessage("Please add at least one education requirement.", "error");
+      return;
+    }
+
+    const jobListing = {
+      company_id: Number(companyId),
+
+      job_title: jobTitle,
+      job_description: jobDescription,
+      required_education: requiredEducation,
+      required_skills: requiredSkills,
+      years_experience: yearsExperience,
+      work_mode: workMode,
+      job_location: jobLocation,
+
+      company_name: companyData.name,
+      company_industry: companyData.industry,
+      company_website: companyData.website,
+      company_location: companyData.location,
+      company_logo_url: companyData.logo_url,
+      company_description: companyData.description
+    };
+
+    const { error } = await supabaseClient
+      .from("job_listing")
+      .insert([jobListing]);
+
+    if (error) {
+      console.error("Error creating job listing:", error);
+      showMessage("There was an error creating the job listing. Check the console for details.", "error");
+      return;
+    }
+
+    showMessage("Job listing created successfully!", "success");
+
+    setTimeout(() => {
+      window.location.href = `EmployerHomePg.html?company_id=${companyId}`;
+    }, 1000);
+  });
+
+  loadCompanyDetails();
 </script>
 
 </body>

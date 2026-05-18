@@ -3,12 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Candidate Profile — TalentMatch</title>
 
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
 
     :root {
       --bg: #F4F1EC;
@@ -38,6 +43,7 @@
       align-items: center;
       padding: 0 2rem;
       height: 60px;
+      z-index: 20;
     }
 
     .nav-logo {
@@ -47,12 +53,47 @@
       color: var(--ink);
     }
 
-    .nav-logo span { color: var(--green); }
+    .nav-logo span { 
+      color: var(--green); 
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
     .back-link {
       font-size: 14px;
       color: var(--ink-soft);
       text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--green);
+    }
+
+    .membership-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .membership-btn:hover {
+      opacity: 0.88;
+    }
+
+    .membership-btn.active {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+      cursor: default;
     }
 
     .profile-page {
@@ -168,6 +209,29 @@
       border-radius: 8px;
       text-decoration: none;
     }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 0 1rem;
+      }
+
+      .top-section {
+        grid-template-columns: 1fr;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .membership-btn {
+        padding: 7px 12px;
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 
@@ -175,7 +239,14 @@
 
 <nav>
   <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
-  <a href="PhoneLogin.html" class="back-link">← Login</a>
+
+  <div class="nav-actions">
+    <button id="membershipBtn" class="membership-btn" onclick="becomeCandidateMember()">
+      Become a Member
+    </button>
+
+    <a href="PhoneLogin.html" class="back-link">← Login</a>
+  </div>
 </nav>
 
 <main class="profile-page">
@@ -217,14 +288,14 @@
           <span id="preferredLocation"></span>
         </div>
 
-         <br/>
+        <br />
 
         <h2>Preferred Mode</h2>
         <div class="skill-tags">
           <span id="workingMode"></span>
         </div>
 
-        <br/>
+        <br />
 
         <h2>Skills</h2>
         <div class="skill-tags" id="skills"></div>
@@ -242,10 +313,71 @@ const supabaseClient = supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
 );
 
-// Get ID from URL
+// Get candidate ID from URL
 function getId() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
+}
+
+function setMembershipButtonAsMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "You are a Member";
+  membershipBtn.classList.add("active");
+  membershipBtn.disabled = true;
+}
+
+function setMembershipButtonAsNonMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "Become a Member";
+  membershipBtn.classList.remove("active");
+  membershipBtn.disabled = false;
+}
+
+async function loadMembershipStatus() {
+  const id = getId();
+
+  if (!id) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("candidate")
+    .select("is_member")
+    .eq("candidate_id", id)
+    .single();
+
+  if (error) {
+    console.error("Error loading membership status:", error);
+    return;
+  }
+
+  if (data.is_member === true) {
+    setMembershipButtonAsMember();
+  } else {
+    setMembershipButtonAsNonMember();
+  }
+}
+
+async function becomeCandidateMember() {
+  const id = getId();
+
+  if (!id) {
+    alert("No candidate profile ID found.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("candidate")
+    .update({ is_member: true })
+    .eq("candidate_id", id);
+
+  if (error) {
+    console.error("Error updating membership:", error);
+    alert("Could not activate membership.");
+    return;
+  }
+
+  setMembershipButtonAsMember();
 }
 
 async function loadProfile() {
@@ -257,20 +389,26 @@ async function loadProfile() {
   }
 
   // Candidate
-  const { data: candidate } = await supabaseClient
+  const { data: candidate, error: candidateError } = await supabaseClient
     .from("candidate")
     .select("*")
     .eq("candidate_id", id)
     .single();
 
-  document.getElementById("name").textContent = candidate.name;
-  document.getElementById("email").textContent = candidate.email;
-  document.getElementById("phone").textContent = candidate.phone;
-  document.getElementById("blurb").textContent = candidate.blurb;
-  
+  if (candidateError) {
+    console.error("Error loading candidate:", candidateError);
+    alert("Could not load candidate profile.");
+    return;
+  }
+
+  document.getElementById("name").textContent = candidate.name || "No name provided";
+  document.getElementById("email").textContent = candidate.email || "No email provided";
+  document.getElementById("phone").textContent = candidate.phone || "No phone provided";
+  document.getElementById("blurb").textContent = candidate.blurb || "No profile summary provided.";
+
   if (candidate.profile_photo_url) {
     document.getElementById("photoBox").innerHTML =
-      `<img src="${candidate.profile_photo_url}">`;
+      `<img src="${candidate.profile_photo_url}" alt="Candidate profile photo">`;
   }
 
   if (candidate.resume_url) {
@@ -279,51 +417,70 @@ async function loadProfile() {
     resume.style.display = "inline-block";
   }
 
+  document.getElementById("preferredLocation").textContent =
+    candidate.preferred_location || "Not specified";
+
+  document.getElementById("workingMode").textContent =
+    candidate.working_mode || "Not specified";
+
   // Education
-  const { data: education } = await supabaseClient
+  const { data: education, error: educationError } = await supabaseClient
     .from("education")
     .select("*")
     .eq("candidate_id", id);
 
-  document.getElementById("education").innerHTML =
-    education.map(e => `
-      <div class="entry">
-        <strong>${e.degree}</strong>
-        <div>${e.level}</div>
-      </div>
-    `).join("");
+  if (educationError) {
+    console.error("Error loading education:", educationError);
+  } else {
+    document.getElementById("education").innerHTML =
+      education.length > 0
+        ? education.map(e => `
+            <div class="entry">
+              <strong>${e.degree || "Degree not specified"}</strong>
+              <div>${e.level || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="entry">No education added.</div>`;
+  }
 
   // Experience
-  const { data: experience } = await supabaseClient
+  const { data: experience, error: experienceError } = await supabaseClient
     .from("experience")
     .select("*")
     .eq("candidate_id", id);
 
-  document.getElementById("experience").innerHTML =
-    experience.map(e => `
-      <div class="entry">
-        <strong>${e.job_title}</strong>
-        <div>${e.company}</div>
-      </div>
-    `).join("");
+  if (experienceError) {
+    console.error("Error loading experience:", experienceError);
+  } else {
+    document.getElementById("experience").innerHTML =
+      experience.length > 0
+        ? experience.map(e => `
+            <div class="entry">
+              <strong>${e.job_title || "Job title not specified"}</strong>
+              <div>${e.company || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="entry">No experience added.</div>`;
+  }
 
   // Skills
-  const { data: skills } = await supabaseClient
+  const { data: skills, error: skillsError } = await supabaseClient
     .from("skill")
     .select("*")
     .eq("candidate_id", id);
 
-  document.getElementById("skills").innerHTML =
-    skills.map(s => `<span>${s.skill_name}</span>`).join("");
-
-  document.getElementById("preferredLocation").textContent =
-  candidate.preferred_location || "Not specified";
-
-document.getElementById("workingMode").textContent =
-  candidate.working_mode || "Not specified";
+  if (skillsError) {
+    console.error("Error loading skills:", skillsError);
+  } else {
+    document.getElementById("skills").innerHTML =
+      skills.length > 0
+        ? skills.map(s => `<span>${s.skill_name}</span>`).join("")
+        : `<span>Not specified</span>`;
+  }
 }
 
 loadProfile();
+loadMembershipStatus();
 </script>
 
 </body>

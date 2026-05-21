@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidate Home — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
+      --ink-muted: #9C9C90;
+      --accent: #2B5CE6;
+      --accent-bg: #EEF2FD;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26, 26, 24, 0.1);
+      --border-md: rgba(26, 26, 24, 0.18);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(244, 241, 236, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--border);
+      color: var(--ink);
+    }
+
+    .btn-nav {
+      background: var(--ink) !important;
+      color: #fff !important;
+      padding: 7px 18px !important;
+      border-radius: 20px !important;
+    }
+
+    .btn-nav:hover {
+      opacity: 0.85 !important;
+    }
+
+    .profile-btn {
+      text-decoration: none;
+      border-radius: 24px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.15s;
+      background: var(--accent);
+      color: #fff !important;
+    }
+
+    .profile-btn:hover {
+      opacity: 0.88;
+      background: var(--accent) !important;
+      color: #fff !important;
+    }
+
+    .hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 70px 2rem 45px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 6vw, 58px);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: var(--ink-soft);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .section-divider {
+      max-width: 1100px;
+      margin: 45px auto 0;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-md);
+    }
+
+    .section-divider span {
+      font-family: 'DM Serif Display', serif;
+      font-size: 13px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+    }
+
+    .listings-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 2rem 80px;
+    }
+
+    .listings-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .listings-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    .listings-header p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .search-bar input {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--ink);
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-bar input::placeholder {
+      color: var(--ink-muted);
+    }
+
+    .filter-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-md);
+      background: var(--bg-card);
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .job-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .job-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      cursor: pointer;
+    }
+
+    .job-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
+      border-color: var(--border-md);
+    }
+
+    .job-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .company-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--accent-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .job-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 17px;
+      line-height: 1.3;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .company-name {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-top: 2px;
+    }
+
+    .job-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .badge-mode-Remote {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .badge-mode-Hybrid {
+      background: var(--accent-bg);
+      color: var(--accent);
+    }
+
+    .badge-mode-On-site {
+      background: #FDF3E7;
+      color: #B36B00;
+    }
+
+    .badge-location {
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+    }
+
+    .badge-exp {
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+    }
+
+    .job-desc {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .skill-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink-soft);
+    }
+
+    .job-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .posted-date {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .btn-apply {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      background: var(--ink);
+      color: #fff;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .btn-apply:hover {
+      opacity: 0.8;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+
+    .empty-state p:first-child {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .logout-btn {
+      border: 1px solid var(--border-md);
+      background: var(--bg-card);
+      color: var(--ink-soft);
+      border-radius: 24px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
+
+    <div class="nav-links">
+      <a href="#" id="profileBtn" class="profile-btn">Profile</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="hero-eyebrow">Candidate Home</span>
+    <h1>Find roles that <em>match your profile</em></h1>
+    <p>Browse open positions and access your candidate profile using the same ID saved from your login.</p>
+  </section>
+
+  <div class="section-divider">
+    <span>Open positions</span>
+  </div>
+
+  <section class="listings-section">
+    <div class="listings-header">
+      <div>
+        <h2>Latest job listings</h2>
+        <p id="results-count">Showing all open positions</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by keyword, title, or skill…" />
+      <button class="filter-btn active" data-mode="All">All</button>
+      <button class="filter-btn" data-mode="Remote">Remote</button>
+      <button class="filter-btn" data-mode="Hybrid">Hybrid</button>
+      <button class="filter-btn" data-mode="On-site">On-site</button>
+    </div>
+
+    <div class="job-grid" id="job-grid"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // ── Supabase client ──────────────────────────────────────
+    const supabaseClient = supabase.createClient(
+      "https://bzakjtfktgdlmmevbnfo.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+    );
+
+    // ── Profile button — link to logged-in candidate's profile
+    const candidateId = localStorage.getItem("candidateId");
+    const profileBtn = document.getElementById("profileBtn");
+    profileBtn.href = candidateId
+      ? `CandidateProfile.html?id=${candidateId}`
+      : "CandidateLogin.html";
+
+    // ── Logout ───────────────────────────────────────────────
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      localStorage.removeItem("candidateId");
+      window.location.href = "index.html";
+    }
+
+    // ── State ────────────────────────────────────────────────
+    let allJobs = []   // full list from Supabase
+    let activeMode = "All";
+    let searchQuery = "";
+
+    // ── Emoji based on job title ─────────────────────────────
+    function jobEmoji(title) {
+      const t = title.toLowerCase();
+      if (t.includes("frontend") || t.includes("ui") || t.includes("ux")) return "💻";
+      if (t.includes("backend") || t.includes("engineer")) return "⚙️";
+      if (t.includes("data") || t.includes("analyst")) return "📊";
+      if (t.includes("full stack") || t.includes("fullstack")) return "🌐";
+      if (t.includes("design")) return "🎨";
+      if (t.includes("devops") || t.includes("cloud")) return "☁️";
+      if (t.includes("mobile")) return "📱";
+      return "💼";
+    }
+
+    // ── "2 days ago" style date formatting ───────────────────
+    function timeAgo(datetimeStr) {
+      const diff = Date.now() - new Date(datetimeStr).getTime();
+      const days = Math.floor(diff / 86400000);
+      if (days === 0) return "Today";
+      if (days === 1) return "1 day ago";
+      if (days < 7) return `${days} days ago`;
+      const weeks = Math.floor(days / 7);
+      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+    }
+
+    // ── Render jobs to the grid ───────────────────────────────
+    function renderJobs() {
+      const grid = document.getElementById("job-grid");
+      const count = document.getElementById("results-count");
+
+      // Client-side filter by work mode + keyword search
+      const q = searchQuery.toLowerCase();
+      const filtered = allJobs.filter(job => {
+        const modeMatch = activeMode === "All" || job.mode === activeMode;
+        const textMatch = !q ||
+          job.title.toLowerCase().includes(q) ||
+          job.description.toLowerCase().includes(q) ||
+          job.skills.some(s => s.toLowerCase().includes(q)) ||
+          job.company.toLowerCase().includes(q);
+        return modeMatch && textMatch;
+      });
+
+      count.textContent = filtered.length === allJobs.length
+        ? `Showing all ${allJobs.length} open positions`
+        : `${filtered.length} of ${allJobs.length} positions`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <p>🔍</p>
+            <p>No jobs match your search.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(job => `
+        <div class="job-card" onclick="alert('Job detail page coming soon!')">
+          <div class="job-card-top">
+            <div>
+              <div class="job-title">${job.title}</div>
+              <div class="company-name">${job.company}</div>
+            </div>
+            <div class="company-logo">${job.emoji}</div>
+          </div>
+
+          <div class="job-meta">
+            <span class="badge badge-mode-${job.mode.replace(" ", "-")}">${job.mode}</span>
+            <span class="badge badge-location">📍 ${job.location}</span>
+            <span class="badge badge-exp">⏱ ${job.yearsExp}+ yr${job.yearsExp !== 1 ? "s" : ""}</span>
+          </div>
+
+          <p class="job-desc">${job.description}</p>
+
+          <div class="skill-tags">
+            ${job.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")}
+          </div>
+
+          <div class="job-card-footer">
+            <span class="posted-date">Posted ${job.posted}</span>
+            <button class="btn-apply" onclick="event.stopPropagation(); alert('Apply flow coming soon!')">View role</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ── Show skeleton cards while loading ────────────────────
+    function showLoading() {
+      document.getElementById("job-grid").innerHTML = Array(4).fill(`
+        <div class="job-card" style="opacity:0.35; pointer-events:none;">
+          <div style="height:16px; background:var(--border-md); border-radius:4px; width:55%; margin-bottom:10px;"></div>
+          <div style="height:12px; background:var(--border); border-radius:4px; width:35%; margin-bottom:18px;"></div>
+          <div style="height:10px; background:var(--border); border-radius:4px; width:80%; margin-bottom:6px;"></div>
+          <div style="height:10px; background:var(--border); border-radius:4px; width:65%;"></div>
+        </div>`).join("");
+    }
+
+    // ── Fetch all open jobs from Supabase ────────────────────
+    // Expects a "job" table joined with an "employer" table.
+    // Adjust table/column names below to match yours exactly.
+    async function loadJobs() {
+      showLoading();
+      try {
+        const { data, error } = await supabaseClient
+          .from("job_listing")
+          .select(`
+            job_id,
+            job_title,
+            job_description,
+            required_education,
+            required_skills,
+            years_experience,
+            work_mode,
+            job_location,
+            company_name,
+            company_logo_url,
+            created_at
+          `)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        // Map Supabase rows → shape renderJobs() expects
+        allJobs = data.map(j => ({
+          id: j.job_id,
+          title: j.job_title,
+          company: j.company_name ?? "Unknown company",
+          emoji: jobEmoji(j.job_title),
+          description: j.job_description ?? "",
+          education: j.required_education ?? "",
+          // required_skills stored as CSV string e.g. "React, SQL, Git"
+          skills: j.required_skills
+            ? j.required_skills.split(",").map(s => s.trim()).filter(Boolean)
+            : [],
+          yearsExp: j.years_experience ?? 0,
+          mode: j.work_mode ?? "On-site",
+          location: j.job_location ?? "",
+          posted: timeAgo(j.created_at)
+        }));
+
+        renderJobs();
+
+      } catch (err) {
+        console.error("Failed to load jobs:", err);
+        document.getElementById("job-grid").innerHTML = `
+          <div class="empty-state">
+            <p>⚠️</p>
+            <p>Could not load jobs. Please try again later.</p>
+            <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small>
+          </div>`;
+      }
+    }
+
+    // ── Filter buttons ────────────────────────────────────────
+    document.querySelectorAll(".filter-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+        activeMode = button.dataset.mode;
+        renderJobs();  // filter client-side — no extra Supabase call needed
+      });
+    });
+
+    // ── Search input ─────────────────────────────────────────
+    document.getElementById("search-input").addEventListener("input", e => {
+      searchQuery = e.target.value;
+      renderJobs();
+    });
+
+    // ── Kick off ─────────────────────────────────────────────
+    loadJobs();
+  </script>
+
+</body>
+
+</html>

@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TalentMatch — Intelligent Hiring Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --bg:        #F4F1EC;
-      --bg-card:   #FDFCFA;
-      --ink:       #1A1A18;
-      --ink-soft:  #5C5C54;
+      --bg: #F4F1EC;
+      --bg-card: #FDFCFA;
+      --ink: #1A1A18;
+      --ink-soft: #5C5C54;
       --ink-muted: #9C9C90;
-      --accent:    #2B5CE6;
+      --accent: #2B5CE6;
       --accent-bg: #EEF2FD;
-      --green:     #1A7F5A;
-      --green-bg:  #E8F5EF;
-      --border:    rgba(26,26,24,0.1);
-      --border-md: rgba(26,26,24,0.18);
-      --radius:    12px;
+      --green: #1A7F5A;
+      --green-bg: #E8F5EF;
+      --border: rgba(26, 26, 24, 0.1);
+      --border-md: rgba(26, 26, 24, 0.18);
+      --radius: 12px;
       --radius-sm: 8px;
     }
 
@@ -36,14 +45,19 @@
 
     /* ── Nav ── */
     nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(244,241,236,0.85);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(244, 241, 236, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0 2rem;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       height: 60px;
     }
+
     .nav-logo {
       font-family: 'DM Serif Display', serif;
       font-size: 20px;
@@ -51,153 +65,296 @@
       color: var(--ink);
       text-decoration: none;
     }
-    .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 8px; }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
     .nav-links a {
-      text-decoration: none; color: var(--ink-soft);
-      font-size: 14px; font-weight: 500;
-      padding: 6px 14px; border-radius: 20px;
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
       transition: all 0.15s;
     }
-    .nav-links a:hover { background: var(--border); color: var(--ink); }
-    .btn-nav {
-      background: var(--ink) !important; color: #fff !important;
-      padding: 7px 18px !important; border-radius: 20px !important;
+
+    .nav-links a:hover {
+      background: var(--border);
+      color: var(--ink);
     }
-    .btn-nav:hover { opacity: 0.85 !important; }
+
+    .btn-nav {
+      background: var(--ink) !important;
+      color: #fff !important;
+      padding: 7px 18px !important;
+      border-radius: 20px !important;
+    }
+
+    .btn-nav:hover {
+      opacity: 0.85 !important;
+    }
 
     /* ── Hero ── */
     .hero {
-      max-width: 900px; margin: 0 auto;
+      max-width: 900px;
+      margin: 0 auto;
       padding: 80px 2rem 60px;
       text-align: center;
     }
+
     .hero-eyebrow {
       display: inline-block;
-      font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
       background: var(--accent-bg);
-      padding: 4px 14px; border-radius: 20px;
+      padding: 4px 14px;
+      border-radius: 20px;
       margin-bottom: 24px;
     }
+
     .hero h1 {
       font-family: 'DM Serif Display', serif;
       font-size: clamp(36px, 6vw, 64px);
-      line-height: 1.1; letter-spacing: -0.03em;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
       color: var(--ink);
       margin-bottom: 20px;
     }
-    .hero h1 em { font-style: italic; color: var(--accent); }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
     .hero p {
-      font-size: 17px; color: var(--ink-soft);
-      max-width: 520px; margin: 0 auto 44px;
+      font-size: 17px;
+      color: var(--ink-soft);
+      max-width: 520px;
+      margin: 0 auto 44px;
       line-height: 1.7;
     }
 
     /* ── Portal cards ── */
     .portal-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 16px; max-width: 660px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 660px;
+      margin: 0 auto;
     }
-    @media (max-width: 540px) { .portal-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 540px) {
+      .portal-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .portal-card {
       background: var(--bg-card);
       border: 1px solid var(--border-md);
       border-radius: 16px;
       padding: 32px 28px;
-      text-decoration: none; color: inherit;
-      display: flex; flex-direction: column; gap: 14px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
       transition: transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
     }
+
     .portal-card::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
       background: var(--card-accent, var(--accent));
-      transform: scaleX(0); transform-origin: left;
+      transform: scaleX(0);
+      transform-origin: left;
       transition: transform 0.25s;
     }
-    .portal-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
-    .portal-card:hover::before { transform: scaleX(1); }
-    .portal-card.candidate { --card-accent: var(--accent); }
-    .portal-card.employer  { --card-accent: var(--green); }
+
+    .portal-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .portal-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .portal-card.candidate {
+      --card-accent: var(--accent);
+    }
+
+    .portal-card.employer {
+      --card-accent: var(--green);
+    }
 
     .portal-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 22px;
     }
-    .candidate .portal-icon { background: var(--accent-bg); }
-    .employer  .portal-icon { background: var(--green-bg); }
+
+    .candidate .portal-icon {
+      background: var(--accent-bg);
+    }
+
+    .employer .portal-icon {
+      background: var(--green-bg);
+    }
 
     .portal-card h2 {
       font-family: 'DM Serif Display', serif;
-      font-size: 22px; letter-spacing: -0.02em;
+      font-size: 22px;
+      letter-spacing: -0.02em;
     }
-    .portal-card p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+    .portal-card p {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
     .portal-cta {
       margin-top: 8px;
-      font-size: 13px; font-weight: 500;
-      display: flex; align-items: center; gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .candidate .portal-cta { color: var(--accent); }
-    .employer  .portal-cta { color: var(--green); }
+
+    .candidate .portal-cta {
+      color: var(--accent);
+    }
+
+    .employer .portal-cta {
+      color: var(--green);
+    }
 
     /* ── Divider ── */
     .section-divider {
-      max-width: 1100px; margin: 64px auto 0;
+      max-width: 1100px;
+      margin: 64px auto 0;
       padding: 0 2rem;
-      display: flex; align-items: center; gap: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .section-divider::before, .section-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border-md);
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-md);
     }
+
     .section-divider span {
       font-family: 'DM Serif Display', serif;
-      font-size: 13px; color: var(--ink-muted);
-      white-space: nowrap; letter-spacing: 0.05em;
+      font-size: 13px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
     }
 
     /* ── Job listings ── */
     .listings-section {
-      max-width: 1100px; margin: 0 auto;
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 40px 2rem 80px;
     }
 
     .listings-header {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
     }
+
     .listings-header h2 {
       font-family: 'DM Serif Display', serif;
-      font-size: 28px; letter-spacing: -0.02em;
+      font-size: 28px;
+      letter-spacing: -0.02em;
     }
-    .listings-header p { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+
+    .listings-header p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
 
     /* Search + filter bar */
     .search-bar {
-      display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
     }
+
     .search-bar input {
-      flex: 1; min-width: 200px;
-      border: 1px solid var(--border-md); border-radius: var(--radius-sm);
-      background: var(--bg-card); color: var(--ink);
-      padding: 10px 16px; font-size: 14px; font-family: inherit;
-      outline: none; transition: border-color 0.15s;
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--ink);
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
     }
-    .search-bar input:focus { border-color: var(--accent); }
-    .search-bar input::placeholder { color: var(--ink-muted); }
+
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-bar input::placeholder {
+      color: var(--ink-muted);
+    }
+
     .filter-btn {
-      padding: 10px 18px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border-md); background: var(--bg-card);
-      color: var(--ink-soft); font-size: 13px; font-family: inherit;
-      font-weight: 500; cursor: pointer; transition: all 0.15s;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-md);
+      background: var(--bg-card);
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
       white-space: nowrap;
     }
-    .filter-btn:hover, .filter-btn.active {
-      background: var(--ink); color: #fff; border-color: var(--ink);
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
     }
 
     /* Job cards grid */
@@ -212,84 +369,167 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 24px;
-      display: flex; flex-direction: column; gap: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
       transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
       cursor: pointer;
     }
+
     .job-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
       border-color: var(--border-md);
     }
 
-    .job-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .job-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
 
     .company-logo {
-      width: 42px; height: 42px; border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
       background: var(--accent-bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
     .job-title {
       font-family: 'DM Serif Display', serif;
-      font-size: 17px; line-height: 1.3;
-      color: var(--ink); letter-spacing: -0.01em;
+      font-size: 17px;
+      line-height: 1.3;
+      color: var(--ink);
+      letter-spacing: -0.01em;
     }
-    .company-name { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+    .company-name {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-top: 2px;
+    }
 
     .job-meta {
-      display: flex; flex-wrap: wrap; gap: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
+
     .badge {
-      font-size: 11px; font-weight: 500; padding: 3px 10px;
-      border-radius: 20px; letter-spacing: 0.01em;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.01em;
     }
-    .badge-mode-Remote   { background: var(--green-bg);  color: var(--green); }
-    .badge-mode-Hybrid   { background: var(--accent-bg); color: var(--accent); }
-    .badge-mode-On-site  { background: #FDF3E7; color: #B36B00; }
-    .badge-location { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--border); }
-    .badge-exp      { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--border); }
+
+    .badge-mode-Remote {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .badge-mode-Hybrid {
+      background: var(--accent-bg);
+      color: var(--accent);
+    }
+
+    .badge-mode-On-site {
+      background: #FDF3E7;
+      color: #B36B00;
+    }
+
+    .badge-location {
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+    }
+
+    .badge-exp {
+      background: var(--bg);
+      color: var(--ink-soft);
+      border: 1px solid var(--border);
+    }
 
     .job-desc {
-      font-size: 13px; color: var(--ink-soft); line-height: 1.65;
-      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
     .skill-tag {
-      font-size: 11px; padding: 3px 10px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--ink-soft);
+      font-size: 11px;
+      padding: 3px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink-soft);
     }
 
     .job-card-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding-top: 12px; border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
     }
-    .posted-date { font-size: 12px; color: var(--ink-muted); }
+
+    .posted-date {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
     .btn-apply {
-      font-size: 12px; font-weight: 500; padding: 7px 16px;
-      border-radius: 20px; border: none; cursor: pointer;
-      background: var(--ink); color: #fff;
-      font-family: inherit; transition: opacity 0.15s;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      background: var(--ink);
+      color: #fff;
+      font-family: inherit;
+      transition: opacity 0.15s;
     }
-    .btn-apply:hover { opacity: 0.8; }
+
+    .btn-apply:hover {
+      opacity: 0.8;
+    }
 
     /* Empty state */
     .empty-state {
       grid-column: 1 / -1;
-      text-align: center; padding: 60px 20px;
-      color: var(--ink-muted); font-size: 14px;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--ink-muted);
+      font-size: 14px;
     }
-    .empty-state p:first-child { font-size: 24px; margin-bottom: 8px; }
+
+    .empty-state p:first-child {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
 
     /* ── Candidate Login Popup ── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(26,26,24,0.45);
+      background: rgba(26, 26, 24, 0.45);
       backdrop-filter: blur(6px);
       display: none;
       align-items: center;
@@ -309,7 +549,7 @@
       border: 1px solid var(--border-md);
       border-radius: 18px;
       padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
       position: relative;
       text-align: center;
     }
@@ -389,9 +629,9 @@
       border-color: var(--accent);
       color: var(--accent);
     }
-
   </style>
 </head>
+
 <body>
 
   <!-- Nav -->
@@ -400,6 +640,42 @@
   </nav>
 
   <!-- Candidate Login / Create Account Popup -->
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow">Intelligent Matching Platform</div>
+    <h1>Find the right fit,<br><em>faster</em></h1>
+    <p>Two-way intelligent matching that connects the right candidates with the right opportunities — no endless
+      scrolling required.</p>
+
+    <div class="portal-grid">
+
+      <!-- Candidate Card -->
+      <a href="#" class="portal-card candidate" onclick="openCandidateModal(event)">
+        <div class="portal-icon">🎓</div>
+        <div>
+          <h2>I'm a Candidate</h2>
+          <p>Create a profile, browse open roles, and get personalised job recommendations matched to your skills and
+            experience.</p>
+        </div>
+        <div class="portal-cta">Find opportunities →</div>
+      </a>
+
+      <!-- Employer Card -->
+      <a href="#" class="portal-card employer" onclick="openEmployerModal(event)">
+        <div class="portal-icon">🏢</div>
+        <div>
+          <h2>I'm an Employer</h2>
+          <p>Post job listings, search candidate profiles, and receive intelligent recommendations for your open roles.
+          </p>
+        </div>
+        <div class="portal-cta" style="color:var(--green)">Find candidates →</div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Candidate Modal -->
   <div class="modal-overlay" id="candidateModal" onclick="closeCandidateModal(event)">
     <div class="modal-box">
       <button class="modal-close" onclick="closeCandidateModal()"> × </button>
@@ -409,75 +685,27 @@
       <p>Log in to view your profile and recommendations, or create an account to get started.</p>
 
       <div class="modal-actions">
-        <a href="LoginCandidate.html" class="modal-btn secondary">Log in</a>
-        <a href="Candidate.html" class="modal-btn primary">Create an account</a>
+        <a href="CandidateLogin.html" class="modal-btn secondary">Log in</a>
+        <a href="CandidateCreate.html" class="modal-btn primary">Create an account</a>
       </div>
     </div>
   </div>
 
+  <!-- Employer Modal -->
+  <div class="modal-overlay" id="EmployerModal" onclick="closeEmployerModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeEmployerModal()">×</button>
 
- <!-- Hero -->
-<section class="hero">
-  <div class="hero-eyebrow">Intelligent Matching Platform</div>
-  <h1>Find the right fit,<br><em>faster</em></h1>
-  <p>Two-way intelligent matching that connects the right candidates with the right opportunities — no endless scrolling required.</p>
+      <div class="modal-icon">🏢</div>
+      <h2>Employer Portal</h2>
+      <p>Log in to manage job listings, or create an employer account to get started.</p>
 
-  <div class="portal-grid">
-
-    <!-- Candidate Card -->
-    <a href="#" class="portal-card candidate" onclick="openCandidateModal(event)">
-      <div class="portal-icon">🎓</div>
-      <div>
-        <h2>I'm a Candidate</h2>
-        <p>Create a profile, browse open roles, and get personalised job recommendations matched to your skills and experience.</p>
+      <div class="modal-actions">
+        <a href="EmployerLogin.html" class="modal-btn secondary">Log in</a>
+        <a href="EmployerCreate.html" class="modal-btn primary">Create an account</a>
       </div>
-      <div class="portal-cta">Find opportunities →</div>
-    </a>
-
-    <!-- Employer Card -->
-    <a href="#" class="portal-card employer" onclick="openEmployerModal(event)">
-      <div class="portal-icon">🏢</div>
-      <div>
-        <h2>I'm an Employer</h2>
-        <p>Post job listings, search candidate profiles, and receive intelligent recommendations for your open roles.</p>
-      </div>
-      <div class="portal-cta" style="color:var(--green)">Find candidates →</div>
-    </a>
-
-  </div>
-</section>
-
-<!-- Candidate Modal -->
-<div class="modal-overlay" id="CandidateModal" onclick="closeCandidateModal(event)">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeCandidateModal()">×</button>
-
-    <div class="modal-icon">🎓</div>
-    <h2>Candidate Portal</h2>
-    <p>Log in to view your profile and recommendations, or create a profile to get started.</p>
-
-    <div class="modal-actions">
-      <a href="PhoneLogin.html" class="modal-btn secondary">Log in</a>
-      <a href="candidate.html" class="modal-btn primary">Create Profile</a>
     </div>
   </div>
-</div>
-
-<!-- Employer Modal -->
-<div class="modal-overlay" id="EmployerModal" onclick="closeEmployerModal(event)">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeEmployerModal()">×</button>
-
-    <div class="modal-icon">🏢</div>
-    <h2>Employer Portal</h2>
-    <p>Log in to manage job listings, or create an employer account to get started.</p>
-
-    <div class="modal-actions">
-      <a href="EmployerLogin.html" class="modal-btn secondary">Log in</a>
-      <a href="CreateEmployerAccount.html" class="modal-btn primary">Create an account</a>
-    </div>
-  </div>
-</div>
   <script>
 
     function openCandidateModal(event) {
@@ -491,7 +719,7 @@
       }
     }
 
-     function openEmployerModal(event) {
+    function openEmployerModal(event) {
       event.preventDefault();
       document.getElementById('EmployerModal').classList.add('active');
     }
@@ -502,11 +730,12 @@
       }
     }
 
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         document.getElementById('candidateModal').classList.remove('active');
       }
     });
   </script>
 </body>
+
 </html>

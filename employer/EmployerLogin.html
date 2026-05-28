@@ -4,25 +4,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — TalentMatch</title>
+  <title>Employer Login — TalentMatch</title>
 
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/candidate-login.css" />
+  <link rel="stylesheet" href="../css/employer-login.css" />
 </head>
 
 <body>
 
   <div class="login-card">
-    <h1>Login</h1>
-    <p>Enter your phone number to access your profile</p>
+    <h1>Employer Login</h1>
+    <p>Enter your company name to access your employer profile</p>
 
-    <input type="tel" id="phoneInput" placeholder="Enter your phone number">
+    <input type="text" id="companyNameInput" placeholder="Enter your company name">
 
     <button onclick="login()">Login</button>
 
     <div class="link">
-      Don’t have a profile? <a href="CandidateCreate.html">Create one</a>
+      Don’t have a profile? <a href="EmployerCreate.html">Create one</a>
     </div>
   </div>
 
@@ -35,31 +35,31 @@
     );
 
     async function login() {
-      const phone = document.getElementById("phoneInput").value.trim();
+      const companyName = document.getElementById("companyNameInput").value.trim();
 
-      if (!phone) {
-        alert("Please enter your phone number.");
+      if (!companyName) {
+        alert("Please enter your company name.");
         return;
       }
 
       const { data, error } = await supabaseClient
-        .from("candidate")
-        .select("candidate_id")
-        .eq("phone", phone)
+        .from("company")
+        .select("company_id")
+        .eq("name", companyName)
         .single();
 
       if (error || !data) {
-        alert("No profile found with that phone number.");
+        alert("No employer profile found with that company name.");
         return;
       }
 
-      const candidateId = data.candidate_id;
+      const companyId = data.company_id;
 
-      // Save the logged-in user's candidate ID
-      localStorage.setItem("candidateId", candidateId);
+      // Save logged-in employer ID
+      localStorage.setItem("companyId", companyId);
 
-      // Send user to the candidate home page
-      window.location.href = "CandidateHome.html";
+      // Go to employer home page
+      window.location.href = "EmployerHome.html";
     }
   </script>
 

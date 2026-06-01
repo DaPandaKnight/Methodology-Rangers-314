@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Home — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/employer-home.css" />
+</head>
+
+<body>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+
+    <div class="nav-links">
+      <a href="#" id="employerProfileBtn" class="profile-btn">Profile</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="hero-eyebrow">Employer Home</span>
+    <h1>Find candidates that <em>match your company</em></h1>
+    <p>Browse candidate profiles, review matches, and access your employer profile using the same company ID saved from login.</p>
+  </section>
+
+  <section class="dashboard-section">
+    <div class="dashboard-grid">
+
+      <div class="dashboard-card">
+        <div class="dashboard-icon">🏢</div>
+        <h2>Company Profile</h2>
+        <p>View and manage your employer details, company information, contacts, and logo.</p>
+        <a href="#" id="companyProfileCardLink">Open profile →</a>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="dashboard-icon">📝</div>
+        <h2>Create Job Listing</h2>
+        <p>Add a new job listing so candidates can find and apply for your open positions.</p>
+        <a id="createJobListingLink" href="#">Create Job Listing</a>
+      </div>
+
+
+    </div>
+  </section>
+
+  <div class="section-divider" id="candidates">
+    <span>Candidate matches</span>
+  </div>
+
+  <section class="candidates-section">
+    <div class="candidates-header">
+      <div>
+        <h2>Latest candidates</h2>
+        <p id="results-count">Showing all candidate profiles</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by name, skill, role, or location…" />
+      <button class="filter-btn active" data-mode="All">All</button>
+      <button class="filter-btn" data-mode="Remote">Remote</button>
+      <button class="filter-btn" data-mode="Hybrid">Hybrid</button>
+      <button class="filter-btn" data-mode="On-site">On-site</button>
+    </div>
+
+    <div class="candidate-grid" id="candidate-grid"></div>
+  </section>
+
+  <script>
+    // Get the company ID saved from EmployerLogin.html
+    const companyId = localStorage.getItem("companyId");
+
+    const createJobListingLink = document.getElementById("createJobListingLink");
+    const employerProfileBtn = document.getElementById("employerProfileBtn");
+    const companyProfileCardLink = document.getElementById("companyProfileCardLink");
+
+    if (companyId) {
+        createJobListingLink.href = `JobListingCreate.html?company_id=${companyId}`;
+        employerProfileBtn.href = `EmployerProfile.html?id=${companyId}`;
+        companyProfileCardLink.href = `EmployerProfile.html?id=${companyId}`;
+    } else {
+        createJobListingLink.href = "EmployerLogin.html";
+        employerProfileBtn.href = "EmployerLogin.html";
+        companyProfileCardLink.href = "EmployerLogin.html";
+        console.error("No companyId found in localStorage.");
+    }
+
+    function logout() {
+        localStorage.removeItem("companyId");
+        window.location.href = "EmployerLogin.html";
+    }
+
+    const candidates = [
+      {
+        id: 1,
+        name: "Ava Thompson",
+        title: "Junior Frontend Developer",
+        emoji: "👩‍💻",
+        description: "Frontend developer with experience building responsive web interfaces using React, JavaScript, CSS, and Git.",
+        skills: ["React", "JavaScript", "CSS", "Git"],
+        yearsExp: 1,
+        mode: "Hybrid",
+        location: "Sydney, NSW",
+        match: "92% match"
+      },
+      {
+        id: 2,
+        name: "Noah Williams",
+        title: "Data Analyst",
+        emoji: "📊",
+        description: "Analytical candidate with experience using Python, SQL, Pandas, and Tableau to generate business insights.",
+        skills: ["Python", "SQL", "Pandas", "Tableau"],
+        yearsExp: 2,
+        mode: "Remote",
+        location: "Sydney, NSW",
+        match: "88% match"
+      },
+      {
+        id: 3,
+        name: "Mia Chen",
+        title: "Backend Engineer",
+        emoji: "⚙️",
+        description: "Backend developer with experience in Java, Spring Boot, Docker, PostgreSQL, and scalable service design.",
+        skills: ["Java", "Spring Boot", "Docker", "PostgreSQL"],
+        yearsExp: 4,
+        mode: "On-site",
+        location: "Melbourne, VIC",
+        match: "84% match"
+      },
+      {
+        id: 4,
+        name: "Liam Brown",
+        title: "Full Stack Developer",
+        emoji: "🌐",
+        description: "Full stack developer experienced across React frontends, Node.js backends, SQL databases, and REST APIs.",
+        skills: ["React", "Node.js", "SQL", "REST APIs"],
+        yearsExp: 3,
+        mode: "Hybrid",
+        location: "Brisbane, QLD",
+        match: "81% match"
+      },
+      {
+        id: 5,
+        name: "Sophie Martin",
+        title: "UI/UX Designer",
+        emoji: "🎨",
+        description: "UX designer skilled in Figma, user research, prototyping, and interface design for web applications.",
+        skills: ["Figma", "User Research", "Prototyping", "CSS"],
+        yearsExp: 2,
+        mode: "Remote",
+        location: "Remote",
+        match: "79% match"
+      }
+    ];
+
+    let activeMode = "All";
+    let searchQuery = "";
+
+    function renderCandidates() {
+      const grid = document.getElementById("candidate-grid");
+      const count = document.getElementById("results-count");
+
+      const filtered = candidates.filter(candidate => {
+        const modeMatch = activeMode === "All" || candidate.mode === activeMode;
+        const q = searchQuery.toLowerCase();
+
+        const textMatch = !q ||
+          candidate.name.toLowerCase().includes(q) ||
+          candidate.title.toLowerCase().includes(q) ||
+          candidate.description.toLowerCase().includes(q) ||
+          candidate.location.toLowerCase().includes(q) ||
+          candidate.skills.some(skill => skill.toLowerCase().includes(q));
+
+        return modeMatch && textMatch;
+      });
+
+      count.textContent = filtered.length === candidates.length
+        ? `Showing all ${candidates.length} candidate profiles`
+        : `${filtered.length} of ${candidates.length} candidates`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <p>🔍</p>
+            <p>No candidates match your search.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(candidate => `
+        <div class="candidate-card" onclick="alert('Candidate detail page coming soon!')">
+          <div class="candidate-card-top">
+            <div>
+              <div class="candidate-name">${candidate.name}</div>
+              <div class="candidate-title">${candidate.title}</div>
+            </div>
+            <div class="candidate-avatar">${candidate.emoji}</div>
+          </div>
+
+          <div class="candidate-meta">
+            <span class="badge badge-mode-${candidate.mode.replace(' ', '-')}">${candidate.mode}</span>
+            <span class="badge badge-location">📍 ${candidate.location}</span>
+            <span class="badge badge-exp">⏱ ${candidate.yearsExp}+ yr${candidate.yearsExp !== 1 ? 's' : ''}</span>
+          </div>
+
+          <p class="candidate-desc">${candidate.description}</p>
+
+          <div class="skill-tags">
+            ${candidate.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join("")}
+          </div>
+
+          <div class="candidate-card-footer">
+            <span class="match-score">${candidate.match}</span>
+            <button class="btn-view" onclick="event.stopPropagation(); alert('Candidate profile page coming soon!')">View candidate</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    
+
+    document.querySelectorAll(".filter-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        activeMode = button.dataset.mode;
+        renderCandidates();
+      });
+    });
+
+    document.getElementById("search-input").addEventListener("input", event => {
+      searchQuery = event.target.value;
+      renderCandidates();
+    });
+
+    renderCandidates();
+
+  </script>
+
+</body>
+</html>

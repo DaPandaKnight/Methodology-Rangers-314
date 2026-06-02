@@ -8,12 +8,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/employer-home.css" />
+
 </head>
 
 <body>
 
   <nav>
-    <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
 
     <div class="nav-links">
       <a href="#" id="employerProfileBtn" class="profile-btn">Profile</a>
@@ -71,175 +72,290 @@
     <div class="candidate-grid" id="candidate-grid"></div>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    // Get the company ID saved from EmployerLogin.html
-    const companyId = localStorage.getItem("companyId");
+    // ── Supabase ─────────────────────────────────────────────
+    const supabaseClient = supabase.createClient(
+      "https://bzakjtfktgdlmmevbnfo.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+    );
 
-    const createJobListingLink = document.getElementById("createJobListingLink");
-    const employerProfileBtn = document.getElementById("employerProfileBtn");
-    const companyProfileCardLink = document.getElementById("companyProfileCardLink");
+    // ── Nav links ────────────────────────────────────────────
+    const companyId = localStorage.getItem("companyId");
+    const createJobListingLink    = document.getElementById("createJobListingLink");
+    const employerProfileBtn      = document.getElementById("employerProfileBtn");
+    const companyProfileCardLink  = document.getElementById("companyProfileCardLink");
 
     if (companyId) {
-        createJobListingLink.href = `JobListingCreate.html?company_id=${companyId}`;
-        employerProfileBtn.href = `EmployerProfile.html?id=${companyId}`;
-        companyProfileCardLink.href = `EmployerProfile.html?id=${companyId}`;
+      createJobListingLink.href   = `JobListingCreate.html?company_id=${companyId}`;
+      employerProfileBtn.href     = `EmployerProfile.html?id=${companyId}`;
+      companyProfileCardLink.href = `EmployerProfile.html?id=${companyId}`;
     } else {
-        createJobListingLink.href = "EmployerLogin.html";
-        employerProfileBtn.href = "EmployerLogin.html";
-        companyProfileCardLink.href = "EmployerLogin.html";
-        console.error("No companyId found in localStorage.");
+      createJobListingLink.href   = "EmployerLogin.html";
+      employerProfileBtn.href     = "EmployerLogin.html";
+      companyProfileCardLink.href = "EmployerLogin.html";
     }
 
     function logout() {
-        localStorage.removeItem("companyId");
-        window.location.href = "EmployerLogin.html";
+      localStorage.removeItem("companyId");
+      window.location.href = "EmployerLogin.html";
     }
 
-    const candidates = [
-      {
-        id: 1,
-        name: "Ava Thompson",
-        title: "Junior Frontend Developer",
-        emoji: "👩‍💻",
-        description: "Frontend developer with experience building responsive web interfaces using React, JavaScript, CSS, and Git.",
-        skills: ["React", "JavaScript", "CSS", "Git"],
-        yearsExp: 1,
-        mode: "Hybrid",
-        location: "Sydney, NSW",
-        match: "92% match"
-      },
-      {
-        id: 2,
-        name: "Noah Williams",
-        title: "Data Analyst",
-        emoji: "📊",
-        description: "Analytical candidate with experience using Python, SQL, Pandas, and Tableau to generate business insights.",
-        skills: ["Python", "SQL", "Pandas", "Tableau"],
-        yearsExp: 2,
-        mode: "Remote",
-        location: "Sydney, NSW",
-        match: "88% match"
-      },
-      {
-        id: 3,
-        name: "Mia Chen",
-        title: "Backend Engineer",
-        emoji: "⚙️",
-        description: "Backend developer with experience in Java, Spring Boot, Docker, PostgreSQL, and scalable service design.",
-        skills: ["Java", "Spring Boot", "Docker", "PostgreSQL"],
-        yearsExp: 4,
-        mode: "On-site",
-        location: "Melbourne, VIC",
-        match: "84% match"
-      },
-      {
-        id: 4,
-        name: "Liam Brown",
-        title: "Full Stack Developer",
-        emoji: "🌐",
-        description: "Full stack developer experienced across React frontends, Node.js backends, SQL databases, and REST APIs.",
-        skills: ["React", "Node.js", "SQL", "REST APIs"],
-        yearsExp: 3,
-        mode: "Hybrid",
-        location: "Brisbane, QLD",
-        match: "81% match"
-      },
-      {
-        id: 5,
-        name: "Sophie Martin",
-        title: "UI/UX Designer",
-        emoji: "🎨",
-        description: "UX designer skilled in Figma, user research, prototyping, and interface design for web applications.",
-        skills: ["Figma", "User Research", "Prototyping", "CSS"],
-        yearsExp: 2,
-        mode: "Remote",
-        location: "Remote",
-        match: "79% match"
+    // ── State ────────────────────────────────────────────────
+    let allCandidates = [];
+    let activeMode    = "All";
+    let searchQuery   = "";
+
+    // ── Helpers ──────────────────────────────────────────────
+    // Total years of experience derived from experience rows
+    function calcYearsExp(experienceRows) {
+      if (!experienceRows || experienceRows.length === 0) return null;
+      let totalDays = 0;
+      const now = new Date();
+      for (const e of experienceRows) {
+        const start = e.start_date ? new Date(e.start_date) : null;
+        const end   = e.end_date   ? new Date(e.end_date)   : now;
+        if (start) totalDays += (end - start) / 86400000;
       }
-    ];
+      const years = Math.floor(totalDays / 365);
+      return years;
+    }
 
-    let activeMode = "All";
-    let searchQuery = "";
+    function nameInitials(name) {
+      return name
+        .split(" ")
+        .slice(0, 2)
+        .map(w => w[0])
+        .join("")
+        .toUpperCase();
+    }
 
+    // ── Skeleton loading ─────────────────────────────────────
+    function showLoading() {
+      document.getElementById("candidate-grid").innerHTML = Array(6).fill(`
+        <div class="candidate-card" style="pointer-events:none; gap:14px;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="skeleton" style="width:46px; height:46px; border-radius:50%; flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div class="skeleton" style="height:16px; width:55%; margin-bottom:7px;"></div>
+              <div class="skeleton" style="height:11px; width:70%;"></div>
+            </div>
+          </div>
+          <div style="display:flex; gap:7px;">
+            <div class="skeleton" style="height:22px; width:70px; border-radius:20px;"></div>
+            <div class="skeleton" style="height:22px; width:90px; border-radius:20px;"></div>
+          </div>
+          <div class="skeleton" style="height:11px; width:100%; margin-bottom:4px;"></div>
+          <div class="skeleton" style="height:11px; width:80%;"></div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div class="skeleton" style="height:22px; width:55px; border-radius:6px;"></div>
+            <div class="skeleton" style="height:22px; width:65px; border-radius:6px;"></div>
+            <div class="skeleton" style="height:22px; width:48px; border-radius:6px;"></div>
+          </div>
+        </div>`).join("");
+    }
+
+    // ── Render ───────────────────────────────────────────────
     function renderCandidates() {
-      const grid = document.getElementById("candidate-grid");
+      const grid  = document.getElementById("candidate-grid");
       const count = document.getElementById("results-count");
+      const q     = searchQuery.toLowerCase();
 
-      const filtered = candidates.filter(candidate => {
-        const modeMatch = activeMode === "All" || candidate.mode === activeMode;
-        const q = searchQuery.toLowerCase();
-
+      const filtered = allCandidates.filter(c => {
+        const modeMatch = activeMode === "All" || c.working_mode === activeMode;
         const textMatch = !q ||
-          candidate.name.toLowerCase().includes(q) ||
-          candidate.title.toLowerCase().includes(q) ||
-          candidate.description.toLowerCase().includes(q) ||
-          candidate.location.toLowerCase().includes(q) ||
-          candidate.skills.some(skill => skill.toLowerCase().includes(q));
-
+          c.name.toLowerCase().includes(q) ||
+          (c.email || "").toLowerCase().includes(q) ||
+          (c.preferred_location || "").toLowerCase().includes(q) ||
+          c.skills.some(s => s.toLowerCase().includes(q)) ||
+          c.education.some(e =>
+            (e.degree || "").toLowerCase().includes(q) ||
+            (e.level  || "").toLowerCase().includes(q)
+          ) ||
+          c.experience.some(e =>
+            (e.job_title || "").toLowerCase().includes(q) ||
+            (e.company   || "").toLowerCase().includes(q)
+          );
         return modeMatch && textMatch;
       });
 
-      count.textContent = filtered.length === candidates.length
-        ? `Showing all ${candidates.length} candidate profiles`
-        : `${filtered.length} of ${candidates.length} candidates`;
+      count.textContent = filtered.length === allCandidates.length
+        ? `Showing all ${allCandidates.length} candidate profiles`
+        : `${filtered.length} of ${allCandidates.length} candidates`;
 
       if (filtered.length === 0) {
         grid.innerHTML = `
           <div class="empty-state">
             <p>🔍</p>
             <p>No candidates match your search.</p>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
-      grid.innerHTML = filtered.map(candidate => `
-        <div class="candidate-card" onclick="alert('Candidate detail page coming soon!')">
-          <div class="candidate-card-top">
-            <div>
-              <div class="candidate-name">${candidate.name}</div>
-              <div class="candidate-title">${candidate.title}</div>
+      grid.innerHTML = filtered.map(c => {
+        const yearsExp  = calcYearsExp(c.experience);
+        const modeClass = (c.working_mode || "On-site").replace(/\s+/g, "-");
+
+        // Avatar: photo if available, else initials
+        const avatarInner = c.profile_photo_url
+          ? `<img src="${c.profile_photo_url}" alt="${c.name}">`
+          : nameInitials(c.name);
+
+        // Education lines: "Bachelor of Computer Science"
+        const eduLines = c.education.length > 0
+          ? c.education.map(e => [e.level, e.degree].filter(Boolean).join(" — ")).join("<br>")
+          : "Not provided";
+
+        // Experience lines: "Software Engineer @ Acme Corp"
+        const expLines = c.experience.length > 0
+          ? c.experience.map(e => {
+              const parts = [e.job_title, e.company ? `@ ${e.company}` : null].filter(Boolean);
+              return parts.join(" ");
+            }).join("<br>")
+          : "Not provided";
+
+        // Skills
+        const skillsHtml = c.skills.length > 0
+          ? c.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")
+          : `<span class="skill-tag" style="color:var(--ink-muted);">None listed</span>`;
+
+        return `
+          <div class="candidate-card" onclick="window.location.href='CandidateProfile.html?id=${c.candidate_id}'">
+
+            <div class="candidate-card-top">
+              <div class="candidate-avatar">${avatarInner}</div>
+              <div>
+                <div class="candidate-name">${c.name}</div>
+                <div class="candidate-contact">
+                  ${c.email  ? `✉️ ${c.email}<br>` : ""}
+                  ${c.phone  ? `📞 ${c.phone}` : ""}
+                </div>
+              </div>
             </div>
-            <div class="candidate-avatar">${candidate.emoji}</div>
-          </div>
 
-          <div class="candidate-meta">
-            <span class="badge badge-mode-${candidate.mode.replace(' ', '-')}">${candidate.mode}</span>
-            <span class="badge badge-location">📍 ${candidate.location}</span>
-            <span class="badge badge-exp">⏱ ${candidate.yearsExp}+ yr${candidate.yearsExp !== 1 ? 's' : ''}</span>
-          </div>
+            <div class="candidate-meta">
+              ${c.working_mode
+                ? `<span class="badge badge-mode-${modeClass}">${c.working_mode}</span>`
+                : ""}
+              ${c.preferred_location
+                ? `<span class="badge badge-location">📍 ${c.preferred_location}</span>`
+                : ""}
+              ${yearsExp !== null
+                ? `<span class="badge badge-exp">⏱ ${yearsExp} yr${yearsExp !== 1 ? "s" : ""} exp</span>`
+                : ""}
+            </div>
 
-          <p class="candidate-desc">${candidate.description}</p>
+            <div class="detail-divider"></div>
 
-          <div class="skill-tags">
-            ${candidate.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join("")}
-          </div>
+            <div class="detail-section">
+              <div class="detail-label">Education</div>
+              <div class="detail-value">${eduLines}</div>
+            </div>
 
-          <div class="candidate-card-footer">
-            <span class="match-score">${candidate.match}</span>
-            <button class="btn-view" onclick="event.stopPropagation(); alert('Candidate profile page coming soon!')">View candidate</button>
-          </div>
-        </div>
-      `).join("");
+            <div class="detail-section">
+              <div class="detail-label">Work Experience</div>
+              <div class="detail-value">${expLines}</div>
+            </div>
+
+            <div class="detail-section">
+              <div class="detail-label">Skills</div>
+              <div class="skill-tags">${skillsHtml}</div>
+            </div>
+
+            <div class="candidate-card-footer">
+              <button class="btn-view" onclick="event.stopPropagation(); window.location.href='CandidateProfile.html?id=${c.candidate_id}'">
+                View profile
+              </button>
+            </div>
+
+          </div>`;
+      }).join("");
     }
 
-    
+    // ── Fetch all candidates + related data ──────────────────
+    async function loadCandidates() {
+      showLoading();
 
+      try {
+        // Fetch all candidates
+        const { data: candidates, error: candError } = await supabaseClient
+          .from("candidate")
+          .select("candidate_id, name, email, phone, profile_photo_url, working_mode, preferred_location")
+          .order("created_at", { ascending: false });
+
+        if (candError) throw candError;
+
+        if (!candidates || candidates.length === 0) {
+          document.getElementById("candidate-grid").innerHTML = `
+            <div class="empty-state"><p>👤</p><p>No candidates have created profiles yet.</p></div>`;
+          document.getElementById("results-count").textContent = "No candidate profiles found";
+          return;
+        }
+
+        const ids = candidates.map(c => c.candidate_id);
+
+        // Parallel fetch of education, experience, skills
+        const [
+          { data: eduData,  error: eduError  },
+          { data: expData,  error: expError  },
+          { data: skillData, error: skillError }
+        ] = await Promise.all([
+          supabaseClient.from("education").select("candidate_id, level, degree, start_date, end_date").in("candidate_id", ids),
+          supabaseClient.from("experience").select("candidate_id, job_title, company, start_date, end_date").in("candidate_id", ids),
+          supabaseClient.from("skill").select("candidate_id, skill_name").in("candidate_id", ids)
+        ]);
+
+        if (eduError)   console.error("Education fetch error:",   eduError);
+        if (expError)   console.error("Experience fetch error:",  expError);
+        if (skillError) console.error("Skills fetch error:",      skillError);
+
+        // Group related rows by candidate_id
+        const eduMap   = {};
+        const expMap   = {};
+        const skillMap = {};
+
+        (eduData   || []).forEach(r => { (eduMap[r.candidate_id]   = eduMap[r.candidate_id]   || []).push(r); });
+        (expData   || []).forEach(r => { (expMap[r.candidate_id]   = expMap[r.candidate_id]   || []).push(r); });
+        (skillData || []).forEach(r => { (skillMap[r.candidate_id] = skillMap[r.candidate_id] || []).push(r); });
+
+        // Attach related data to each candidate
+        allCandidates = candidates.map(c => ({
+          ...c,
+          education:  eduMap[c.candidate_id]   || [],
+          experience: expMap[c.candidate_id]   || [],
+          skills:    (skillMap[c.candidate_id] || []).map(s => s.skill_name)
+        }));
+
+        renderCandidates();
+
+      } catch (err) {
+        console.error("Failed to load candidates:", err);
+        document.getElementById("candidate-grid").innerHTML = `
+          <div class="empty-state">
+            <p>⚠️</p>
+            <p>Could not load candidates. Please try again later.</p>
+            <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small>
+          </div>`;
+      }
+    }
+
+    // ── Filters & search ─────────────────────────────────────
     document.querySelectorAll(".filter-btn").forEach(button => {
       button.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
         button.classList.add("active");
         activeMode = button.dataset.mode;
         renderCandidates();
       });
     });
 
-    document.getElementById("search-input").addEventListener("input", event => {
-      searchQuery = event.target.value;
+    document.getElementById("search-input").addEventListener("input", e => {
+      searchQuery = e.target.value;
       renderCandidates();
     });
 
-    renderCandidates();
+    // ── Kick off ─────────────────────────────────────────────
+    loadCandidates();
 
   </script>
 

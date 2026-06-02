@@ -9,5 +9,3 @@ Ok things to do
 - Fuzzy search and plus
 - Fix become member button, it needs to turn off member too (it also throws errors we need to avoid)
 - Way more random jobs / profiles / positions
-- Make users actually users with authentcation (security) Joe will do this ....
-

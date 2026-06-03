@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Candidate Profile — TalentMatch</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/candidate-profile.css" />
+</head>
+
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+
+  <div class="nav-actions">
+	<a href="CandidateHome.html" class="back-link">Home</a>
+	
+    <button id="membershipBtn" class="membership-btn" onclick="becomeCandidateMember()">
+      Become a Member
+    </button>
+
+    <a href="CandidateLogin.html" class="back-link">← Log Out</a>
+  </div>
+</nav>
+
+<main class="profile-page">
+  <div class="profile-card">
+
+    <section class="top-section">
+      <div class="photo-box" id="photoBox">
+        <div class="placeholder">🖼️</div>
+      </div>
+
+      <div>
+        <h1 id="name">Loading...</h1>
+
+        <div class="contact">
+          <div id="email"></div>
+          <div id="phone"></div>
+        </div>
+
+        <div class="blurb" id="blurb"></div>
+
+        <a id="resume" class="resume-btn" target="_blank" style="display:none;">
+          Download Resume
+        </a>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <div>
+        <h2>Education</h2>
+        <div id="education"></div>
+
+        <h2>Experience</h2>
+        <div id="experience"></div>
+      </div>
+
+      <div>
+        <h2>Preferred Location</h2>
+        <div class="skill-tags">
+          <span id="preferredLocation"></span>
+        </div>
+
+        <br />
+
+        <h2>Preferred Mode</h2>
+        <div class="skill-tags">
+          <span id="workingMode"></span>
+        </div>
+
+        <br />
+
+        <h2>Skills</h2>
+        <div class="skill-tags" id="skills"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabaseClient = supabase.createClient(
+  "https://bzakjtfktgdlmmevbnfo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+);
+
+// Get candidate ID from URL
+function getId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+function setMembershipButtonAsMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "You are a Member";
+  membershipBtn.classList.add("active");
+  membershipBtn.disabled = true;
+}
+
+function setMembershipButtonAsNonMember() {
+  const membershipBtn = document.getElementById("membershipBtn");
+  membershipBtn.textContent = "Become a Member";
+  membershipBtn.classList.remove("active");
+  membershipBtn.disabled = false;
+}
+
+async function loadMembershipStatus() {
+  const id = getId();
+
+  if (!id) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("candidate")
+    .select("is_member")
+    .eq("candidate_id", id)
+    .single();
+
+  if (error) {
+    console.error("Error loading membership status:", error);
+    return;
+  }
+
+  if (data.is_member === true) {
+    setMembershipButtonAsMember();
+  } else {
+    setMembershipButtonAsNonMember();
+  }
+}
+
+async function becomeCandidateMember() {
+  const id = getId();
+
+  if (!id) {
+    alert("No candidate profile ID found.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("candidate")
+    .update({ is_member: true })
+    .eq("candidate_id", id);
+
+  if (error) {
+    console.error("Error updating membership:", error);
+    alert("Could not activate membership.");
+    return;
+  }
+
+  setMembershipButtonAsMember();
+}
+
+async function loadProfile() {
+  const id = getId();
+
+  if (!id) {
+    alert("No profile ID found.");
+    return;
+  }
+
+  // Candidate
+  const { data: candidate, error: candidateError } = await supabaseClient
+    .from("candidate")
+    .select("*")
+    .eq("candidate_id", id)
+    .single();
+
+  if (candidateError) {
+    console.error("Error loading candidate:", candidateError);
+    alert("Could not load candidate profile.");
+    return;
+  }
+
+  document.getElementById("name").textContent = candidate.name || "No name provided";
+  document.getElementById("email").textContent = candidate.email || "No email provided";
+  document.getElementById("phone").textContent = candidate.phone || "No phone provided";
+  document.getElementById("blurb").textContent = candidate.blurb || "No profile summary provided.";
+
+  if (candidate.profile_photo_url) {
+    document.getElementById("photoBox").innerHTML =
+      `<img src="${candidate.profile_photo_url}" alt="Candidate profile photo">`;
+  }
+
+  if (candidate.resume_url) {
+    const resume = document.getElementById("resume");
+    resume.href = candidate.resume_url;
+    resume.style.display = "inline-block";
+  }
+
+  document.getElementById("preferredLocation").textContent =
+    candidate.preferred_location || "Not specified";
+
+  document.getElementById("workingMode").textContent =
+    candidate.working_mode || "Not specified";
+
+  // Education
+  const { data: education, error: educationError } = await supabaseClient
+    .from("education")
+    .select("*")
+    .eq("candidate_id", id);
+
+  if (educationError) {
+    console.error("Error loading education:", educationError);
+  } else {
+    document.getElementById("education").innerHTML =
+      education.length > 0
+        ? education.map(e => `
+            <div class="entry">
+              <strong>${e.degree || "Degree not specified"}</strong>
+              <div>${e.level || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="entry">No education added.</div>`;
+  }
+
+  // Experience
+  const { data: experience, error: experienceError } = await supabaseClient
+    .from("experience")
+    .select("*")
+    .eq("candidate_id", id);
+
+  if (experienceError) {
+    console.error("Error loading experience:", experienceError);
+  } else {
+    document.getElementById("experience").innerHTML =
+      experience.length > 0
+        ? experience.map(e => `
+            <div class="entry">
+              <strong>${e.job_title || "Job title not specified"}</strong>
+              <div>${e.company || ""}</div>
+            </div>
+          `).join("")
+        : `<div class="entry">No experience added.</div>`;
+  }
+
+  // Skills
+  const { data: skills, error: skillsError } = await supabaseClient
+    .from("skill")
+    .select("*")
+    .eq("candidate_id", id);
+
+  if (skillsError) {
+    console.error("Error loading skills:", skillsError);
+  } else {
+    document.getElementById("skills").innerHTML =
+      skills.length > 0
+        ? skills.map(s => `<span>${s.skill_name}</span>`).join("")
+        : `<span>Not specified</span>`;
+  }
+}
+
+loadProfile();
+loadMembershipStatus();
+</script>
+
+</body>
+</html>

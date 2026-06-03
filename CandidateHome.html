@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidate Home — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../css/candidate-home.css" />
+  <style>
+    /* ── Show more button ───────────────────────────────── */
+    .show-more-btn {
+      display: block;
+      margin: 28px auto 0;
+      padding: 12px 36px;
+      background: transparent;
+      border: 1.5px solid var(--border-md);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .show-more-btn:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+
+    <div class="nav-links">
+      <a href="#" id="profileBtn" class="profile-btn">Profile</a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="hero-eyebrow">Candidate Home</span>
+    <h1>Find roles that <em>match your profile</em></h1>
+    <p>Browse open positions and access your candidate profile using the same ID saved from your login.</p>
+  </section>
+
+  <div class="section-divider">
+    <span>Open positions</span>
+  </div>
+
+  <section class="listings-section">
+    <div class="listings-header">
+      <div>
+        <h2>Latest job listings</h2>
+        <p id="results-count">Showing all open positions</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search by keyword, title, or skill…" />
+      <button class="filter-btn active" data-mode="All">All</button>
+      <button class="filter-btn" data-mode="Remote">Remote</button>
+      <button class="filter-btn" data-mode="Hybrid">Hybrid</button>
+      <button class="filter-btn" data-mode="On-site">On-site</button>
+    </div>
+
+    <div class="job-grid" id="job-grid"></div>
+    <div id="show-more-container" style="display:none; text-align:center; margin-top:28px;">
+      <button id="show-more-btn" class="show-more-btn"></button>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // ── Supabase client ──────────────────────────────────────
+    const supabaseClient = supabase.createClient(
+      "https://bzakjtfktgdlmmevbnfo.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+    );
+
+    // ── Profile button — link to logged-in candidate's profile
+    const candidateId = localStorage.getItem("candidateId");
+    const profileBtn = document.getElementById("profileBtn");
+    profileBtn.href = candidateId
+      ? `CandidateProfile.html?id=${candidateId}`
+      : "CandidateLogin.html";
+
+    // ── Logout ───────────────────────────────────────────────
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      localStorage.removeItem("candidateId");
+      window.location.href = "../index.html";
+    }
+
+    // ── Constants ────────────────────────────────────────────
+    const PAGE_SIZE = 25;
+
+    // ── State ────────────────────────────────────────────────
+    let allJobs = [];        // full list fetched from Supabase
+    let filteredJobs = [];   // result of current search/filter
+    let visibleCount = PAGE_SIZE;
+    let activeMode = "All";
+    let searchQuery = "";
+    let isMember = false;
+
+    // ── Emoji based on job title ─────────────────────────────
+    function jobEmoji(title) {
+      const t = title.toLowerCase();
+      if (t.includes("frontend") || t.includes("ui") || t.includes("ux")) return "💻";
+      if (t.includes("backend") || t.includes("engineer")) return "⚙️";
+      if (t.includes("data") || t.includes("analyst")) return "📊";
+      if (t.includes("full stack") || t.includes("fullstack")) return "🌐";
+      if (t.includes("design")) return "🎨";
+      if (t.includes("devops") || t.includes("cloud")) return "☁️";
+      if (t.includes("mobile")) return "📱";
+      return "💼";
+    }
+
+    // ── "2 days ago" style date formatting ───────────────────
+    function timeAgo(datetimeStr) {
+      const diff = Date.now() - new Date(datetimeStr).getTime();
+      const days = Math.floor(diff / 86400000);
+      if (days === 0) return "Today";
+      if (days === 1) return "1 day ago";
+      if (days < 7) return `${days} days ago`;
+      const weeks = Math.floor(days / 7);
+      return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+    }
+
+    // ── Build a single job card's HTML ───────────────────────
+    function jobCardHTML(job) {
+      return `
+        <div class="job-card" onclick="alert('Job detail page coming soon!')">
+          <div class="job-card-top">
+            <div>
+              <div class="job-title">${job.title}</div>
+              <div class="company-name">${job.company}</div>
+            </div>
+            <div class="company-logo">${job.emoji}</div>
+          </div>
+
+          <div class="job-meta">
+            <span class="badge badge-mode-${job.mode.replace(" ", "-")}">${job.mode}</span>
+            <span class="badge badge-location">📍 ${job.location}</span>
+            <span class="badge badge-exp">⏱ ${job.yearsExp}+ yr${job.yearsExp !== 1 ? "s" : ""}</span>
+          </div>
+
+          <p class="job-desc">${job.description}</p>
+
+          <div class="skill-tags">
+            ${job.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")}
+          </div>
+
+          <div class="job-card-footer">
+            <span class="posted-date">Posted ${job.posted}</span>
+            <button class="btn-apply" onclick="event.stopPropagation(); alert('Apply flow coming soon!')">View role</button>
+          </div>
+        </div>`;
+    }
+
+    // ── Education level normaliser ────────────────────────────
+    // Maps level strings to a tier number. Higher = more qualified.
+    // Candidate side uses dropdown values; job side is still free-text.
+    function eduTier(str) {
+      if (!str) return 0;
+      const s = str.toLowerCase();
+      if (s.includes("phd") || s.includes("doctor"))                          return 6;
+      if (s.includes("master"))                                                return 5;
+      if (s.includes("graduate"))                                              return 4;
+      if (s.includes("bachelor") || s.includes("degree"))                     return 3;
+      if (s.includes("advanced diploma"))                                      return 2;
+      if (s.includes("diploma") || s.includes("associate"))                   return 2;
+      if (s.includes("cert"))                                                  return 1;
+      return 0;
+    }
+
+    // ── Calculate total years of work experience ─────────────
+    // Sums up all experience rows using start_date / end_date.
+    // If end_date is null the candidate is assumed still working there.
+    function calcYearsExperience(experienceRows) {
+      const now = new Date();
+      let totalMs = 0;
+      for (const row of experienceRows) {
+        const start = row.start_date ? new Date(row.start_date) : null;
+        const end   = row.end_date   ? new Date(row.end_date)   : now;
+        if (start && end > start) totalMs += (end - start);
+      }
+      return totalMs / (1000 * 60 * 60 * 24 * 365.25);
+    }
+
+    // ── Check whether candidate education satisfies job requirement
+    // Uses loose string-contains since job side is still free-text.
+    function educationSatisfied(candidateDegrees, requiredEducation) {
+      if (!requiredEducation) return true; // no requirement — always passes
+      const req = requiredEducation.toLowerCase();
+      return candidateDegrees.some(deg =>
+        deg.toLowerCase().includes(req) || req.includes(deg.toLowerCase())
+      );
+    }
+
+    // ── Score a single job against the candidate profile ─────
+    // Returns null if the candidate is hard-excluded from this job.
+    // Returns a number 0–19 otherwise.
+    function scoreJob(job, profile) {
+      let score = 0;
+
+      // ── Hard exclusion 1: education degree must satisfy requirement ──
+      if (!educationSatisfied(profile.degrees, job.requiredEducation)) return null;
+
+      // ── Hard exclusion 2: candidate must have enough years experience ─
+      if (profile.yearsExperience < job.yearsExp) return null;
+
+      // 1. Job title — 5 points (highest priority)
+      if (profile.pastJobTitles.length > 0 && job.title) {
+        const jTitle = job.title.toLowerCase();
+        const hasMatch = profile.pastJobTitles.some(pt =>
+          pt.toLowerCase().split(/\s+/).some(word =>
+            word.length > 2 && jTitle.includes(word)
+          )
+        );
+        if (hasMatch) score += 5;
+      }
+
+      // 2. Education degree match — 4 points
+      if (profile.degrees.length > 0 && job.requiredEducation) {
+        const req = job.requiredEducation.toLowerCase();
+        const hasMatch = profile.degrees.some(deg =>
+          deg.toLowerCase().includes(req) || req.includes(deg.toLowerCase())
+        );
+        if (hasMatch) score += 4;
+      }
+
+      // 3. Education tier meets or exceeds requirement — 3 points
+      if (profile.eduTier > 0 && job.eduTier > 0) {
+        if (profile.eduTier >= job.eduTier) score += 3;
+      } else if (job.eduTier === 0) {
+        score += 3; // no requirement — everyone qualifies
+      }
+
+      // 4. Years experience meets or exceeds requirement — 3 points
+      // (already passed hard exclusion so always scores here)
+      if (job.yearsExp === 0 || profile.yearsExperience >= job.yearsExp) score += 3;
+
+      // 5. Location — 2 points
+      if (profile.preferredLocation && job.location) {
+        const cLoc = profile.preferredLocation.toLowerCase();
+        const jLoc = job.location.toLowerCase();
+        if (cLoc.includes(jLoc) || jLoc.includes(cLoc)) score += 2;
+      }
+
+      // 6. Work mode — 2 points
+      if (profile.workingMode && job.mode) {
+        if (profile.workingMode.toLowerCase() === job.mode.toLowerCase()) score += 2;
+      }
+
+      // 7. Skills — 1 point
+      if (profile.skills.length > 0 && job.skills.length > 0) {
+        const candidateSkills = profile.skills.map(s => s.toLowerCase());
+        const jobSkills       = job.skills.map(s => s.toLowerCase());
+        const hasMatch = jobSkills.some(js =>
+          candidateSkills.some(cs => cs.includes(js) || js.includes(cs))
+        );
+        if (hasMatch) score += 1;
+      }
+
+      return score;
+    }
+
+    // ── Fetch candidate profile data for matching ─────────────
+    async function fetchCandidateProfile() {
+      const { data: cand, error: cErr } = await supabaseClient
+        .from("candidate")
+        .select("working_mode, preferred_location")
+        .eq("candidate_id", candidateId)
+        .single();
+      if (cErr) throw cErr;
+
+      const { data: skills, error: sErr } = await supabaseClient
+        .from("skill")
+        .select("skill_name")
+        .eq("candidate_id", candidateId);
+      if (sErr) throw sErr;
+
+      // Fetch level AND degree now
+      const { data: education, error: eErr } = await supabaseClient
+        .from("education")
+        .select("level, degree")
+        .eq("candidate_id", candidateId);
+      if (eErr) throw eErr;
+
+      // Fetch start_date and end_date to calculate years experience
+      const { data: experience, error: xErr } = await supabaseClient
+        .from("experience")
+        .select("job_title, start_date, end_date")
+        .eq("candidate_id", candidateId);
+      if (xErr) throw xErr;
+
+      const highestEduTier = education && education.length > 0
+        ? Math.max(...education.map(e => eduTier(e.level)))
+        : 0;
+
+      return {
+        workingMode:       cand.working_mode ?? "",
+        preferredLocation: cand.preferred_location ?? "",
+        skills:            skills     ? skills.map(s => s.skill_name.trim()).filter(Boolean) : [],
+        eduTier:           highestEduTier,
+        degrees:           education  ? education.map(e => e.degree).filter(Boolean) : [],
+        yearsExperience:   experience ? calcYearsExperience(experience) : 0,
+        pastJobTitles:     experience ? experience.map(e => e.job_title).filter(Boolean) : []
+      };
+    }
+
+    // ── Fetch all jobs and return top 10 for this candidate ───
+    async function loadTop10Jobs(profile) {
+      const { data, error } = await supabaseClient
+        .from("job_listing")
+        .select(`
+          job_id,
+          job_title,
+          job_description,
+          required_education,
+          required_skills,
+          years_experience,
+          work_mode,
+          job_location,
+          company_name,
+          company_logo_url,
+          created_at
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const scored = data.map(j => {
+        const job = {
+          id:                j.job_id,
+          title:             j.job_title,
+          company:           j.company_name ?? "Unknown company",
+          emoji:             jobEmoji(j.job_title),
+          description:       j.job_description ?? "",
+          skills:            j.required_skills
+            ? j.required_skills.split(",").map(s => s.trim()).filter(Boolean)
+            : [],
+          yearsExp:          j.years_experience ?? 0,
+          mode:              j.work_mode ?? "On-site",
+          location:          j.job_location ?? "",
+          eduTier:           eduTier(j.required_education),
+          requiredEducation: j.required_education ?? "",
+          posted:            timeAgo(j.created_at)
+        };
+        job.score = scoreJob(job, profile);
+        return job;
+      });
+
+      // Filter out hard-excluded jobs (score === null), sort, take top 10
+      const eligible = scored.filter(j => j.score !== null);
+      eligible.sort((a, b) => b.score - a.score);
+      return eligible.slice(0, 10);
+    }
+
+    // ── Render top 10 for non-members ────────────────────────
+    async function showTop10() {
+      showLoading();
+      try {
+        const profile = await fetchCandidateProfile();
+        const top10   = await loadTop10Jobs(profile);
+
+        document.getElementById("results-count").textContent =
+          `Your top ${top10.length} recommended positions. As a non-member you can only see up to your TOP 10 recommended positions. Upgrade to membership for UNLIMITED ACCESS to all job listings!`;
+
+        if (top10.length === 0) {
+          document.getElementById("job-grid").innerHTML = `
+            <div class="empty-state">
+              <p>🔍</p>
+              <p>No matching jobs found. Try updating your profile.</p>
+            </div>`;
+          return;
+        }
+
+        document.getElementById("job-grid").innerHTML = top10.map(jobCardHTML).join("");
+
+      } catch (err) {
+        console.error("Failed to load top 10 jobs:", err);
+        document.getElementById("job-grid").innerHTML = `
+          <div class="empty-state">
+            <p>⚠️</p>
+            <p>Could not load recommendations. Please try again later.</p>
+            <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small>
+          </div>`;
+      }
+    }
+
+    // ── Render the current visible slice of filteredJobs ─────
+    function renderJobs() {
+      const grid = document.getElementById("job-grid");
+      const count = document.getElementById("results-count");
+
+      const q = searchQuery.toLowerCase();
+      filteredJobs = allJobs.filter(job => {
+        const modeMatch = activeMode === "All" || job.mode === activeMode;
+        const textMatch = !q ||
+          job.title.toLowerCase().includes(q) ||
+          job.description.toLowerCase().includes(q) ||
+          job.skills.some(s => s.toLowerCase().includes(q)) ||
+          job.company.toLowerCase().includes(q);
+        return modeMatch && textMatch;
+      });
+
+      const slice = filteredJobs.slice(0, visibleCount);
+      const remaining = filteredJobs.length - slice.length;
+
+      count.textContent = filteredJobs.length === allJobs.length
+        ? `Showing ${slice.length} of ${allJobs.length} open positions`
+        : `${filteredJobs.length} of ${allJobs.length} positions match`;
+
+      if (filteredJobs.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <p>🔍</p>
+            <p>No jobs match your search.</p>
+          </div>`;
+        document.getElementById("show-more-container").style.display = "none";
+        return;
+      }
+
+      grid.innerHTML = slice.map(jobCardHTML).join("");
+
+      const showMoreContainer = document.getElementById("show-more-container");
+      const showMoreBtn = document.getElementById("show-more-btn");
+      if (remaining > 0) {
+        showMoreBtn.textContent = `Show more (${remaining} remaining)`;
+        showMoreContainer.style.display = "block";
+      } else {
+        showMoreContainer.style.display = "none";
+      }
+    }
+
+    // ── Show skeleton cards while loading ────────────────────
+    function showLoading() {
+      document.getElementById("job-grid").innerHTML = Array(4).fill(`
+        <div class="job-card" style="opacity:0.35; pointer-events:none;">
+          <div style="height:16px; background:var(--border-md); border-radius:4px; width:55%; margin-bottom:10px;"></div>
+          <div style="height:12px; background:var(--border); border-radius:4px; width:35%; margin-bottom:18px;"></div>
+          <div style="height:10px; background:var(--border); border-radius:4px; width:80%; margin-bottom:6px;"></div>
+          <div style="height:10px; background:var(--border); border-radius:4px; width:65%;"></div>
+        </div>`).join("");
+    }
+
+    // ── Check membership → load jobs ─────────────────────────
+    async function init() {
+      const { data: candidate, error: memberError } = await supabaseClient
+        .from("candidate")
+        .select("is_member")
+        .eq("candidate_id", candidateId)
+        .single();
+
+      if (memberError || !candidate) {
+        showTop10();
+        return;
+      }
+
+      isMember = candidate.is_member === true;
+
+      if (!isMember) {
+        showTop10();
+        return;
+      }
+
+      // Member — fetch and display all jobs with pagination
+      showLoading();
+      try {
+        const { data, error } = await supabaseClient
+          .from("job_listing")
+          .select(`
+            job_id,
+            job_title,
+            job_description,
+            required_education,
+            required_skills,
+            years_experience,
+            work_mode,
+            job_location,
+            company_name,
+            company_logo_url,
+            created_at
+          `)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        allJobs = data.map(j => ({
+          id:          j.job_id,
+          title:       j.job_title,
+          company:     j.company_name ?? "Unknown company",
+          emoji:       jobEmoji(j.job_title),
+          description: j.job_description ?? "",
+          education:   j.required_education ?? "",
+          skills:      j.required_skills
+            ? j.required_skills.split(",").map(s => s.trim()).filter(Boolean)
+            : [],
+          yearsExp:    j.years_experience ?? 0,
+          mode:        j.work_mode ?? "On-site",
+          location:    j.job_location ?? "",
+          posted:      timeAgo(j.created_at)
+        }));
+
+        renderJobs();
+
+      } catch (err) {
+        console.error("Failed to load jobs:", err);
+        document.getElementById("job-grid").innerHTML = `
+          <div class="empty-state">
+            <p>⚠️</p>
+            <p>Could not load jobs. Please try again later.</p>
+            <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small>
+          </div>`;
+      }
+    }
+
+    // ── Show More button ─────────────────────────────────────
+    document.getElementById("show-more-btn").addEventListener("click", () => {
+      visibleCount += PAGE_SIZE;
+      renderJobs();
+    });
+
+    // ── Filter buttons ────────────────────────────────────────
+    document.querySelectorAll(".filter-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+        activeMode = button.dataset.mode;
+        visibleCount = PAGE_SIZE;
+        renderJobs();
+      });
+    });
+
+    // ── Search input ─────────────────────────────────────────
+    document.getElementById("search-input").addEventListener("input", e => {
+      searchQuery = e.target.value;
+      visibleCount = PAGE_SIZE;
+      renderJobs();
+    });
+
+    // ── Kick off ─────────────────────────────────────────────
+    init();
+  </script>
+
+</body>
+
+</html>

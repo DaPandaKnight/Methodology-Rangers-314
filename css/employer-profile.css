@@ -5,21 +5,31 @@
 }
 
 :root {
-  --bg: #F4F1EC;
-  --bg-card: #FDFCFA;
-  --ink: #1A1A18;
-  --ink-soft: #5C5C54;
-  --green: #1A7F5A;
-  --green-bg: #E8F5EF;
-  --border: rgba(26,26,24,0.1);
+  --bg:        #F4F1EC;
+  --bg-card:   #FDFCFA;
+  --ink:       #1A1A18;
+  --ink-soft:  #5C5C54;
+  --ink-muted: #9C9C90;
+  --accent:    #2B5CE6;
+  --accent-bg: #EEF2FD;
+  --green:     #1A7F5A;
+  --green-bg:  #E8F5EF;
+  --border:    rgba(26,26,24,0.1);
   --border-md: rgba(26,26,24,0.18);
+  --radius:    12px;
+  --radius-sm: 8px;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
 }
+
+/* ── Nav ─────────────────────────────────────────────────── */
 
 nav {
   position: sticky;
@@ -56,6 +66,7 @@ nav {
   font-size: 14px;
   color: var(--ink-soft);
   text-decoration: none;
+  transition: color 0.15s;
 }
 
 .back-link:hover {
@@ -71,7 +82,7 @@ nav {
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   cursor: pointer;
-  transition: 0.15s;
+  transition: opacity 0.15s;
 }
 
 .membership-btn:hover {
@@ -84,6 +95,8 @@ nav {
   border: 1px solid var(--green);
   cursor: default;
 }
+
+/* ── Page layout ─────────────────────────────────────────── */
 
 .profile-page {
   max-width: 1100px;
@@ -98,6 +111,8 @@ nav {
   padding: 32px;
 }
 
+/* ── Top section: logo + company info ────────────────────── */
+
 .top-section {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -108,7 +123,7 @@ nav {
 
 .logo-box {
   background: var(--green-bg);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 22px;
   text-align: center;
   border: 1px dashed var(--border-md);
@@ -118,7 +133,7 @@ nav {
   width: 180px;
   height: 180px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: var(--radius);
   background: white;
   padding: 12px;
 }
@@ -128,7 +143,7 @@ nav {
   height: 180px;
   margin: auto;
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,10 +154,12 @@ h1 {
   font-family: 'DM Serif Display', serif;
   font-size: 42px;
   margin-bottom: 10px;
+  letter-spacing: -0.02em;
 }
 
 h2 {
   font-size: 20px;
+  font-weight: 500;
   margin-bottom: 16px;
 }
 
@@ -156,34 +173,9 @@ h2 {
   background: #F7F5F1;
   border: 1px solid var(--border);
   padding: 18px;
-  border-radius: 12px;
+  border-radius: var(--radius);
   color: var(--ink-soft);
   line-height: 1.6;
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 40px;
-  margin-top: 32px;
-}
-
-.entry {
-  background: #FFFEFC;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 14px;
-}
-
-.entry strong {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.entry div {
-  color: var(--ink-soft);
-  margin-top: 4px;
 }
 
 .website-btn {
@@ -191,31 +183,203 @@ h2 {
   margin-top: 20px;
   background: var(--green);
   color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.website-btn:hover {
+  opacity: 0.88;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ── Content grid: listings + side card ──────────────────── */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
+  margin-top: 32px;
 }
 
 .side-card {
   background: #FFFEFC;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 20px;
   height: fit-content;
 }
 
 .empty {
-  color: var(--ink-soft);
+  color: var(--ink-muted);
   font-size: 14px;
+  padding: 12px 0;
 }
 
-@media (max-width: 850px) {
+/* ── Job listing cards ───────────────────────────────────── */
+
+.job-card {
+  background: #FFFEFC;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.job-card:hover {
+  border-color: var(--border-md);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.job-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.job-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.job-date {
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.job-description {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.job-detail-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.job-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.detail-value {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+
+.badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.01em;
+}
+
+.badge-mode-Remote {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.badge-mode-Hybrid {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.badge-mode-On-site {
+  background: #FDF3E7;
+  color: #B36B00;
+}
+
+.badge-mode-other {
+  background: var(--bg);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+}
+
+.badge-location,
+.badge-exp {
+  background: var(--bg);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
+}
+
+/* ── Skill tags ──────────────────────────────────────────── */
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink-soft);
+}
+
+.skill-tag.muted {
+  color: var(--ink-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-card {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
   nav {
     padding: 0 1rem;
   }
 
-  .top-section,
-  .content-grid {
+  .top-section {
     grid-template-columns: 1fr;
   }
 
@@ -226,5 +390,10 @@ h2 {
   .membership-btn {
     padding: 7px 12px;
     font-size: 13px;
+  }
+
+  .job-card-top {
+    flex-direction: column;
+    gap: 6px;
   }
 }

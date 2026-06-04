@@ -1,0 +1,7 @@
+Testing Log 
+
+Date: 28th of May
+
+Issue:Found issue with memebership button throws errors and does not allow 'unticking'
+
+Current progress: Resolved 2nd June

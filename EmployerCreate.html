@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create an Employer Account — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/employer-create.css" />
+</head>
+
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+  <a href="../index.html" class="back-link">← Back</a>
+</nav>
+
+<main class="page">
+
+  <section id="companyAccountPage">
+    <div class="page-header">
+      <h1>Create A Company Account</h1>
+      <p>Enter your company details first. Once the employer account is created, you can continue to create a job listing.</p>
+    </div>
+
+    <form class="form-box" onsubmit="createCompanyAccount(event)">
+
+      <section class="form-card">
+        <h2>Company Details</h2>
+
+        <div class="two-column">
+          <div>
+            <label>Company Name</label>
+            <input type="text" id="companyName" required>
+          </div>
+
+          <div>
+            <label>Industry</label>
+            <select id="companyIndustry" required>
+              <option value="">Select industry</option>
+              <option>Technology</option>
+			  <option>Artificial Intelligence</option>
+              <option>Fintech</option>
+              <option>Healthcare</option>
+              <option>Consulting</option>
+              <option>Finance</option>
+              <option>Telecommunications</option>
+              <option>Mining & Resources</option>
+			  <option>Automotive & Energy</option>
+			  <option>Aerospace</option>
+			  <option>HR & Recruitment</option>
+			  <option>Real Estate Tech</option>
+			  <option>Biotechnology</option>
+			  <option>Professional Legal Services</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+		
+		<div id="otherIndustryContainer" style="display: none; margin-top: 10px;">
+		  <label for="otherIndustry">Please specify your industry:</label>
+		  <input type="text" id="otherIndustry" />
+		</div>
+
+        <label>Company Website</label>
+        <input type="url" id="companyWebsite" placeholder="https://example.com">
+
+        <label>Company Location</label>
+        <input type="text" id="companyLocation" placeholder="Wollongong, NSW">
+      </section>
+
+      <section class="form-card">
+        <h2>Company Logo</h2>
+        <p class="small-note">Upload a logo to display with your job listings.</p>
+
+        <div class="logo-upload">
+          <div class="logo-placeholder" id="logoPreview">🏢</div>
+          <input type="file" id="companyLogo" accept="image/*">
+        </div>
+      </section>
+
+      <section class="form-card">
+        <h2>Company Description</h2>
+        <textarea id="companyDescription" rows="5" placeholder="Briefly describe the company, workplace culture, and what candidates should know."></textarea>
+      </section>
+
+      <button type="submit" class="submit-btn">
+        Create Account
+      </button>
+
+    </form>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://bzakjtfktgdlmmevbnfo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+  );
+
+  const COMPANY_BUCKET = "company-files";
+  const companyIndustrySelect = document.getElementById("companyIndustry");
+  const otherIndustryContainer = document.getElementById("otherIndustryContainer");
+  const otherIndustryInput = document.getElementById("otherIndustry");
+
+  companyIndustrySelect.addEventListener("change", function () {
+      if (this.value.toLowerCase() === "other") {
+          otherIndustryContainer.style.display = "block";
+          otherIndustryInput.required = true;
+      } else {
+          otherIndustryContainer.style.display = "none";
+          otherIndustryInput.required = false;
+          otherIndustryInput.value = ""; // clear previous value
+      }
+  });
+
+  document.getElementById("companyLogo").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        document.getElementById("logoPreview").innerHTML =
+          `<img src="${e.target.result}" alt="Company logo preview">`;
+      };
+
+      reader.readAsDataURL(file);
+    }
+  });
+
+  async function uploadCompanyLogo(file) {
+    if (!file) return null;
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `logos/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { error } = await supabaseClient.storage
+      .from(COMPANY_BUCKET)
+      .upload(fileName, file);
+
+    if (error) {
+      console.error("Logo upload error:", error);
+      alert("Logo upload failed.");
+      return null;
+    }
+
+    const { data } = supabaseClient.storage
+      .from(COMPANY_BUCKET)
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function createCompanyAccount(event) {
+    event.preventDefault();
+
+    const companyName = document.getElementById("companyName").value.trim();
+	let industry = companyIndustrySelect.value;
+	if (industry.toLowerCase() === "other") {
+	    industry = otherIndustryInput.value.trim();
+	    if (!industry) {
+	        alert("Please specify your industry.");
+	        return;
+	    }
+	}    const website = document.getElementById("companyWebsite").value.trim();
+    const location = document.getElementById("companyLocation").value.trim();
+    const description = document.getElementById("companyDescription").value.trim();
+
+    const contactName = document.getElementById("contactName").value.trim();
+    const contactPosition = document.getElementById("contactPosition").value.trim();
+    const contactEmail = document.getElementById("contactEmail").value.trim();
+    const contactPhone = document.getElementById("contactPhone").value.trim();
+
+    const logoFile = document.getElementById("companyLogo").files[0];
+
+    if (!companyName || !industry || !contactName || !contactEmail) {
+      alert("Please complete the required company and contact fields.");
+      return;
+    }
+
+    const logoUrl = await uploadCompanyLogo(logoFile);
+
+    const { data: company, error: companyError } = await supabaseClient
+      .from("company")
+      .insert([{
+        name: companyName,
+        industry: industry,
+        website: website,
+        location: location,
+        logo_url: logoUrl,
+        description: description
+      }])
+      .select()
+      .single();
+
+    if (companyError) {
+      console.error("Company insert error:", companyError);
+      alert("Error creating company account. Check if the company name already exists.");
+      return;
+    }
+
+    const { error: contactError } = await supabaseClient
+      .from("contact")
+      .insert([{
+        company_id: company.company_id,
+        full_name: contactName,
+        position: contactPosition,
+        email: contactEmail,
+        phone_number: contactPhone
+      }]);
+
+    if (contactError) {
+      console.error("Contact insert error:", contactError);
+      alert("Company was created, but contact details failed to save.");
+      return;
+    }
+
+    alert("Company account created successfully.");
+
+    window.location.href = `EmployerProfile.html?id=${company.company_id}`;
+  }
+</script>
+
+</body>
+</html>

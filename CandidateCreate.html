@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Profile — TalentMatch</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/candidate-create.css" />
+  <style>
+    /* ── Autocomplete (job title + skills) ──────────────── */
+    .autocomplete-wrap {
+      position: relative;
+    }
+    .suggestions-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: #FDFCFA;
+      border: 1px solid rgba(26,26,24,0.18);
+      border-radius: 0 0 8px 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .suggestions-list.open { display: block; }
+    .suggestions-list li {
+      padding: 9px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(26,26,24,0.06);
+    }
+    .suggestions-list li:last-child { border-bottom: none; }
+    .suggestions-list li:hover,
+    .suggestions-list li.active {
+      background: #E8F5EF;
+      color: #1A7F5A;
+    }
+    .suggestions-list li.no-match {
+      color: #5C5C54;
+      font-style: italic;
+      cursor: default;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+  <a href="CandidateProfile.html" class="back-link">Find Profile</a>
+</nav>
+
+<main class="profile-page">
+
+  <div class="page-header">
+    <h1>Create A Profile</h1>
+    <p>Enter your details so employers can understand your background and skills.</p>
+  </div>
+
+  <form class="profile-form">
+
+    <section class="form-card top-section">
+      <div class="photo-upload">
+        <div class="photo-placeholder" id="photoPreview">🖼️</div>
+        <label>Profile Photo</label>
+        <input type="file" id="profilePhoto" accept="image/*">
+      </div>
+
+      <div>
+        <label>Full Name</label>
+        <input type="text" id="fullName">
+        <label>Email</label>
+        <input type="email" id="email">
+        <label>Phone Number</label>
+        <input type="tel" id="phone">
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Education</h2>
+
+      <div id="educationContainer">
+        <div class="entry-set">
+          <label>Level of qualification</label>
+          <select class="edu-level" onchange="updateDegreeOptions(this)">
+            <option value="">Select level of qualification</option>
+            <option>Year 10</option>
+            <option>Year 12</option>
+            <option>Certificate I</option>
+            <option>Certificate II</option>
+            <option>Certificate III</option>
+            <option>Certificate IV</option>
+            <option>Diploma</option>
+            <option>Advanced Diploma</option>
+            <option>Associate Degree</option>
+            <option>Bachelor Degree</option>
+            <option>Graduate Certificate</option>
+            <option>Graduate Diploma</option>
+            <option>Master Degree</option>
+            <option>Doctoral Degree</option>
+            <option>Other</option>
+            <option>Prefer Not to Say</option>
+          </select>
+
+          <label>Qualification title</label>
+          <select class="edu-degree">
+            <option value="">Select level of qualification first</option>
+          </select>
+
+          <div class="two-column">
+            <div>
+              <label>Start Date</label>
+              <input type="date" class="edu-start">
+            </div>
+            <div>
+              <label>Completion Date</label>
+              <input type="date" class="edu-end">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="add-btn" onclick="addEducation()">+ Add another education</button>
+    </section>
+
+    <section class="form-card">
+      <h2>Experience</h2>
+
+      <div id="experienceContainer">
+        <div class="entry-set">
+          <label>Job title</label>
+          <div class="autocomplete-wrap">
+            <input type="text" class="exp-title" placeholder="Type to search job titles…" autocomplete="off"
+                   oninput="filterTitles(this)" onblur="clearSuggestions(this, 150, allJobTitles)">
+            <ul class="suggestions-list"></ul>
+          </div>
+
+          <label>Company Name</label>
+          <input type="text" class="exp-company">
+
+          <div class="two-column">
+            <div>
+              <label>Start Date</label>
+              <input type="date" class="exp-start">
+            </div>
+            <div>
+              <label>End Date</label>
+              <input type="date" class="exp-end">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="add-btn" onclick="addExperience()">+ Add another experience</button>
+    </section>
+
+    <section class="form-card">
+      <h2>Skills</h2>
+      <p style="color: var(--ink-soft); font-size: 13px; margin-bottom: 12px;">Search and add skills that match what employers are looking for.</p>
+
+      <div class="skill-tags" id="skillTags"></div>
+
+      <div class="autocomplete-wrap" style="margin-top: 10px;">
+        <input type="text" id="skillInput" placeholder="Type to search skills…" autocomplete="off"
+               oninput="filterSkills(this)" onblur="clearSuggestions(this, 150, allSkills)">
+        <ul class="suggestions-list" id="skillSuggestions"></ul>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Preferred Working Mode</h2>
+      <select id="workModeSelect">
+        <option value="">Select Mode</option>
+        <option value="Remote">Remote</option>
+        <option value="On-site">On-site</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+    </section>
+
+    <section class="form-card">
+      <h2>Preferred Location</h2>
+      <input type="text" id="LocationSelect" placeholder="Enter a location">
+    </section>
+
+    <section class="form-card">
+      <h2>Personal Blurb</h2>
+      <textarea id="blurb" rows="5"></textarea>
+    </section>
+
+    <section class="form-card">
+      <h2>Upload Resume</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Upload your resume as a PDF or Word document.</p>
+      <div class="resume-upload">
+        <input type="file" id="resumeFile" accept=".pdf,.doc,.docx">
+      </div>
+    </section>
+
+    <button type="button" class="submit-btn" onclick="submitProfile()">
+      Create Profile
+    </button>
+
+  </form>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://bzakjtfktgdlmmevbnfo.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+  );
+
+  const STORAGE_BUCKET = "candidate-files";
+
+  document.getElementById("profilePhoto").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("photoPreview").innerHTML =
+          `<img src="${e.target.result}" alt="Profile photo preview">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // ── Qualification title options keyed by level ───────────
+  const DEGREE_OPTIONS = {
+    "Year 10": [
+      { group: "General", options: ["Record of School Achievement (RoSA)", "Other"] }
+    ],
+    "Year 12": [
+      { group: "General", options: ["Higher School Certificate (HSC)", "Victorian Certificate of Education (VCE)", "Queensland Certificate of Education (QCE)", "Other"] }
+    ],
+    "Certificate I": [
+      { group: "Business", options: ["Certificate I in Business", "Certificate I in Retail", "Certificate I in Workplace Skills", "Certificate I in Financial Services"] },
+      { group: "Hospitality", options: ["Certificate I in Hospitality", "Certificate I in Food Preparation"] },
+      { group: "Education", options: ["Certificate I in General Education for Adults", "Certificate I in Vocational Preparation"] },
+      { group: "Construction & Trades", options: ["Certificate I in Construction", "Certificate I in Manufacturing", "Certificate I in Engineering"] },
+      { group: "Technology", options: ["Certificate I in Information Technology", "Certificate I in Digital Media"] },
+      { group: "Health & Community", options: ["Certificate I in Health Support Services", "Certificate I in Community Services"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Certificate II": [
+      { group: "Business", options: ["Certificate II in Business", "Certificate II in Retail", "Certificate II in Customer Contact", "Certificate II in Workplace Skills", "Certificate II in Financial Services"] },
+      { group: "Technology", options: ["Certificate II in Information Technology", "Certificate II in Digital Media Technology", "Certificate II in Telecommunications"] },
+      { group: "Hospitality", options: ["Certificate II in Hospitality", "Certificate II in Kitchen Operations", "Certificate II in Tourism"] },
+      { group: "Construction & Trades", options: ["Certificate II in Construction", "Certificate II in Engineering Pathways", "Certificate II in Electrotechnology", "Certificate II in Automotive Servicing", "Certificate II in Manufacturing"] },
+      { group: "Health & Community", options: ["Certificate II in Community Services", "Certificate II in Health Support Services", "Certificate II in Medical Service First Response"] },
+      { group: "Agriculture & Environment", options: ["Certificate II in Agriculture", "Certificate II in Horticulture", "Certificate II in Conservation and Land Management"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Certificate III": [
+      { group: "Business", options: ["Certificate III in Business", "Certificate III in Retail"] },
+      { group: "Technology", options: ["Certificate III in Information Technology"] },
+	  { group: "Veterinary", options: ["Certificate III in Animal Care Services", "Certificate III in Wildlife and Exhibited Animal Care", "Certificate III in Horse Care"] },
+      { group: "Construction & Trades", options: ["Certificate III in Carpentry", "Certificate III in Plumbing"] },
+      { group: "Health & Community", options: ["Certificate III in Individual Support", "Certificate III in Early Childhood Education"] },
+      { group: "Hospitality", options: ["Certificate III in Hospitality"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Certificate IV": [
+      { group: "Technology", options: ["Certificate IV in Information Technology", "Certificate IV in Cyber Security"] },
+      { group: "Business", options: ["Certificate IV in Business", "Certificate IV in Accounting and Bookkeeping", "Certificate IV in Marketing", "Certificate IV in Project Management", "Certificate IV in Leadership and Management"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Diploma": [
+      { group: "Technology", options: ["Diploma of Information Technology"] },
+      { group: "Business", options: ["Diploma of Business", "Diploma of Accounting", "Diploma of Marketing", "Diploma of Project Management", "Diploma of Leadership and Management"] },
+      { group: "Health & Community", options: ["Diploma of Nursing", "Diploma of Early Childhood Education"] },
+      { group: "Hospitality", options: ["Diploma of Hospitality Management"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Advanced Diploma": [
+      { group: "Technology", options: ["Advanced Diploma of Information Technology"] },
+      { group: "Business", options: ["Advanced Diploma of Business", "Advanced Diploma of Accounting", "Advanced Diploma of Leadership and Management"] },
+      { group: "Engineering", options: ["Advanced Diploma of Engineering"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Associate Degree": [
+      { group: "Technology", options: ["Associate Degree of Information Technology"] },
+      { group: "Business", options: ["Associate Degree of Business"] },
+      { group: "Science & Arts", options: ["Associate Degree of Science", "Associate Degree of Arts"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Bachelor Degree": [
+      { group: "Technology", options: ["Bachelor of Computer Science", "Bachelor of Information Technology", "Bachelor of Software Engineering", "Bachelor of Data Science", "Bachelor of Cybersecurity", "Bachelor of Information Systems", "Bachelor of Artificial Intelligence", "Bachelor of Cloud Computing", "Bachelor of Data Analytics", "Bachelor of Computer Engineering", "Bachelor of Network Engineering", "Bachelor of Games Development", "Bachelor of Digital Technologies", "Bachelor of Web Development", "Bachelor of ICT", "Bachelor of Machine Learning", "Bachelor of Robotics", "Bachelor of Computing"] },
+      { group: "Business", options: ["Bachelor of Business", "Bachelor of Commerce", "Bachelor of Accounting", "Bachelor of Marketing", "Bachelor of Finance", "Bachelor of Economics", "Bachelor of Human Resource Management", "Bachelor of International Business", "Bachelor of Entrepreneurship", "Bachelor of Property Economics", "Bachelor of Supply Chain Management", "Bachelor of Banking and Finance", "Bachelor of Business Analytics", "Bachelor of Management", "Bachelor of Tourism Management", "Bachelor of Event Management", "Bachelor of Financial Planning", "Bachelor of Public Administration"] },
+      { group: "Engineering", options: ["Bachelor of Engineering (Civil)", "Bachelor of Engineering (Mechanical)", "Bachelor of Engineering (Electrical)", "Bachelor of Engineering (Software)", "Bachelor of Engineering (Chemical)", "Bachelor of Engineering (Mining)", "Bachelor of Engineering (Mechatronic)", "Bachelor of Engineering (Biomedical)", "Bachelor of Engineering (Aerospace)", "Bachelor of Engineering (Environmental)", "Bachelor of Engineering (Structural)", "Bachelor of Engineering (Industrial)", "Bachelor of Engineering (Petroleum)", "Bachelor of Engineering (Marine)", "Bachelor of Engineering (Telecommunications)"] },
+      { group: "Health", options: ["Bachelor of Nursing", "Bachelor of Psychology", "Bachelor of Medicine / Bachelor of Surgery (MBBS)", "Bachelor of Pharmacy", "Bachelor of Physiotherapy", "Bachelor of Occupational Therapy", "Bachelor of Public Health", "Bachelor of Medical Science", "Bachelor of Biomedical Science", "Bachelor of Exercise Science", "Bachelor of Nutrition and Dietetics", "Bachelor of Paramedicine", "Bachelor of Speech Pathology", "Bachelor of Midwifery", "Bachelor of Health Science", "Bachelor of Chiropractic Science", "Bachelor of Podiatric Medicine"] },
+      { group: "Education & Arts", options: ["Bachelor of Education", "Bachelor of Arts", "Bachelor of Science", "Bachelor of Laws", "Bachelor of Architecture", "Bachelor of Design", "Bachelor of Communication", "Bachelor of Journalism", "Bachelor of Criminology", "Bachelor of International Studies", "Bachelor of Social Work", "Bachelor of Environmental Science", "Bachelor of Music", "Bachelor of Creative Arts", "Bachelor of Film and Television", "Bachelor of Languages", "Bachelor of History", "Bachelor of Political Science", "Bachelor of Sociology", "Bachelor of Geography"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Graduate Certificate": [
+      { group: "Technology", options: ["Graduate Certificate in Information Technology", "Graduate Certificate in Data Science", "Graduate Certificate in Cybersecurity", "Graduate Certificate in Artificial Intelligence", "Graduate Certificate in Cloud Computing", "Graduate Certificate in Business Analytics", "Graduate Certificate in Software Engineering"] },
+      { group: "Business", options: ["Graduate Certificate in Business Administration", "Graduate Certificate in Accounting", "Graduate Certificate in Finance", "Graduate Certificate in Marketing", "Graduate Certificate in Human Resource Management", "Graduate Certificate in Project Management", "Graduate Certificate in Leadership"] },
+      { group: "Education", options: ["Graduate Certificate in Education", "Graduate Certificate in Educational Leadership", "Graduate Certificate in Teaching"] },
+      { group: "Health", options: ["Graduate Certificate in Public Health", "Graduate Certificate in Mental Health", "Graduate Certificate in Nursing"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Graduate Diploma": [
+      { group: "Technology", options: ["Graduate Diploma of Information Technology", "Graduate Diploma of Data Science", "Graduate Diploma of Cybersecurity", "Graduate Diploma of Artificial Intelligence", "Graduate Diploma of Information Systems", "Graduate Diploma of Business Analytics"] },
+      { group: "Business", options: ["Graduate Diploma of Business Administration", "Graduate Diploma of Accounting", "Graduate Diploma of Finance", "Graduate Diploma of Marketing", "Graduate Diploma of Human Resource Management", "Graduate Diploma of Project Management"] },
+      { group: "Education & Law", options: ["Graduate Diploma of Education", "Graduate Diploma of Law", "Graduate Diploma of Legal Practice", "Graduate Diploma of Educational Leadership"] },
+      { group: "Health", options: ["Graduate Diploma of Public Health", "Graduate Diploma of Psychology", "Graduate Diploma of Nursing", "Graduate Diploma of Mental Health"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Master Degree": [
+      { group: "Technology", options: ["Master of Information Technology", "Master of Data Science", "Master of Cybersecurity", "Master of Artificial Intelligence", "Master of Computer Science", "Master of Information Systems", "Master of Data Analytics", "Master of Software Engineering", "Master of Cloud Computing", "Master of Machine Learning"] },
+      { group: "Business", options: ["Master of Business Administration (MBA)", "Master of Accounting", "Master of Finance", "Master of Marketing", "Master of Project Management", "Master of Human Resource Management", "Master of International Business", "Master of Supply Chain Management", "Master of Commerce", "Master of Economics", "Master of Business Analytics", "Master of Management"] },
+      { group: "Engineering", options: ["Master of Engineering", "Master of Engineering (Civil)", "Master of Engineering (Mechanical)", "Master of Engineering (Electrical)", "Master of Engineering (Software)", "Master of Engineering (Chemical)", "Master of Engineering (Environmental)", "Master of Engineering (Mining)"] },
+      { group: "Health & Law", options: ["Master of Public Health", "Master of Laws (LLM)", "Master of Nursing", "Master of Clinical Psychology", "Master of Physiotherapy", "Master of Occupational Therapy", "Master of Health Administration", "Master of Medical Science"] },
+      { group: "Education", options: ["Master of Education", "Master of Teaching", "Master of Educational Leadership", "Master of Curriculum Studies"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Doctoral Degree": [
+      { group: "General", options: ["Doctor of Philosophy (PhD)", "Doctor of Science (DSc)", "Doctor of Letters (DLitt)"] },
+      { group: "Business", options: ["Doctor of Business Administration (DBA)", "Doctor of Commerce"] },
+      { group: "Health", options: ["Doctor of Medicine (MD)", "Doctor of Nursing Practice", "Doctor of Public Health", "Doctor of Clinical Psychology", "Doctor of Pharmacy"] },
+      { group: "Education & Engineering", options: ["Doctor of Education (EdD)", "Doctor of Engineering", "Doctor of Information Technology", "Doctor of Computer Science"] },
+      { group: "Law", options: ["Doctor of Juridical Science", "Doctor of Laws"] },
+      { group: "Other", options: ["Other"] }
+    ],
+    "Other":             [{ group: "Other", options: ["Other"] }],
+    "Prefer Not to Say": [{ group: "Prefer Not to Say", options: ["Prefer Not to Say"] }]
+  };
+
+  // ── Level dropdown HTML helper ───────────────────────────
+  function levelSelectHTML() {
+    return `
+      <select class="edu-level" onchange="updateDegreeOptions(this)">
+        <option value="">Select level of qualification</option>
+        <option>Year 10</option>
+        <option>Year 12</option>
+        <option>Certificate I</option>
+        <option>Certificate II</option>
+        <option>Certificate III</option>
+        <option>Certificate IV</option>
+        <option>Diploma</option>
+        <option>Advanced Diploma</option>
+        <option>Associate Degree</option>
+        <option>Bachelor Degree</option>
+        <option>Graduate Certificate</option>
+        <option>Graduate Diploma</option>
+        <option>Master Degree</option>
+        <option>Doctoral Degree</option>
+        <option>Other</option>
+        <option>Prefer Not to Say</option>
+      </select>`;
+  }
+
+  // ── Populate degree dropdown based on selected level ─────
+  function updateDegreeOptions(levelSelect) {
+    const entrySet = levelSelect.closest(".entry-set");
+    const degreeSelect = entrySet.querySelector(".edu-degree");
+    const level = levelSelect.value;
+    const groups = DEGREE_OPTIONS[level] || [];
+
+    if (!level) {
+      degreeSelect.innerHTML = `<option value="">Select level of qualification first</option>`;
+      return;
+    }
+
+    degreeSelect.innerHTML =
+      `<option value="">Select qualification title</option>` +
+      groups.map(g => `
+        <optgroup label="${g.group}">
+          ${g.options.map(o => `<option value="${o}">${o}</option>`).join("")}
+        </optgroup>
+      `).join("");
+  }
+
+  function addEducation() {
+    const container = document.getElementById("educationContainer");
+    const newEducation = document.createElement("div");
+    newEducation.classList.add("entry-set");
+    newEducation.innerHTML = `
+      <label>Level of qualification</label>
+      ${levelSelectHTML()}
+      <label>Qualification title</label>
+      <select class="edu-degree">
+        <option value="">Select level of qualification first</option>
+      </select>
+      <div class="two-column">
+        <div>
+          <label>Start Date</label>
+          <input type="date" class="edu-start">
+        </div>
+        <div>
+          <label>Completion Date</label>
+          <input type="date" class="edu-end">
+        </div>
+      </div>
+    `;
+    container.appendChild(newEducation);
+  }
+
+  // ── Shared autocomplete data ─────────────────────────────
+  let allJobTitles = [];
+  let allSkills    = [];
+
+  // ── Fetch job titles from job_listing ───────────────────
+  async function loadJobTitles() {
+    const { data, error } = await supabaseClient
+      .from("job_listing")
+      .select("job_title");
+    if (error) { console.error("Could not load job titles:", error); return; }
+    allJobTitles = [...new Set(data.map(r => r.job_title).filter(Boolean))].sort();
+  }
+
+  // ── Fetch skills by splitting required_skills CSV rows ──
+  async function loadSkills() {
+    const { data, error } = await supabaseClient
+      .from("job_listing")
+      .select("required_skills");
+    if (error) { console.error("Could not load skills:", error); return; }
+    const flat = data.flatMap(r =>
+      r.required_skills
+        ? r.required_skills.split(",").map(s => s.trim()).filter(Boolean)
+        : []
+    );
+    allSkills = [...new Set(flat)].sort();
+  }
+
+  // ── Generic autocomplete filter ──────────────────────────
+  function filterAutocomplete(input, list, sourceList, onSelect) {
+    const q = input.value.trim().toLowerCase();
+    if (!q) {
+      list.classList.remove("open");
+      list.innerHTML = "";
+      return;
+    }
+    const matches = sourceList.filter(t => t.toLowerCase().includes(q)).slice(0, 20);
+    if (matches.length === 0) {
+      list.innerHTML = `<li class="no-match">No matches found</li>`;
+    } else {
+      list.innerHTML = matches.map(t =>
+        `<li data-value="${t}">${t}</li>`
+      ).join("");
+      list.querySelectorAll("li[data-value]").forEach(li => {
+        li.addEventListener("mousedown", () => onSelect(li.dataset.value));
+      });
+    }
+    list.classList.add("open");
+  }
+
+  // ── Job title autocomplete ───────────────────────────────
+  function filterTitles(input) {
+    const wrap = input.closest(".autocomplete-wrap");
+    const list = wrap.querySelector(".suggestions-list");
+    filterAutocomplete(input, list, allJobTitles, (value) => {
+      input.value = value;
+      list.classList.remove("open");
+      list.innerHTML = "";
+    });
+  }
+
+  // ── Skills autocomplete ──────────────────────────────────
+  function filterSkills(input) {
+    const list = document.getElementById("skillSuggestions");
+    filterAutocomplete(input, list, allSkills, (value) => {
+      addSkillTag(value);
+      input.value = "";
+      list.classList.remove("open");
+      list.innerHTML = "";
+    });
+  }
+
+  // ── Add a skill tag to the display ──────────────────────
+  function addSkillTag(skillName) {
+    const skillTags = document.getElementById("skillTags");
+    const existing = Array.from(skillTags.querySelectorAll("span"))
+      .map(s => s.dataset.skill);
+    if (existing.includes(skillName)) return; // no duplicates
+
+    const tag = document.createElement("span");
+    tag.dataset.skill = skillName;
+    tag.innerHTML = `${skillName} ×`;
+    tag.onclick = () => tag.remove();
+    skillTags.appendChild(tag);
+  }
+
+  // ── Shared blur handler — clears input if not in list ───
+  function clearSuggestions(input, delay, sourceList) {
+    setTimeout(() => {
+      const wrap = input.closest(".autocomplete-wrap");
+      const list = wrap.querySelector(".suggestions-list");
+      if (sourceList && !sourceList.includes(input.value.trim())) {
+        input.value = "";
+      }
+      list.classList.remove("open");
+      list.innerHTML = "";
+    }, delay);
+  }
+
+  // ── Job title input HTML helper ──────────────────────────
+  function jobTitleInputHTML() {
+    return `
+      <div class="autocomplete-wrap">
+        <input type="text" class="exp-title" placeholder="Type to search job titles…" autocomplete="off"
+               oninput="filterTitles(this)" onblur="clearSuggestions(this, 150, allJobTitles)">
+        <ul class="suggestions-list"></ul>
+      </div>`;
+  }
+
+  function addExperience() {
+    const container = document.getElementById("experienceContainer");
+    const newExperience = document.createElement("div");
+    newExperience.classList.add("entry-set");
+    newExperience.innerHTML = `
+      <label>Job title</label>
+      ${jobTitleInputHTML()}
+      <label>Company Name</label>
+      <input type="text" class="exp-company">
+      <div class="two-column">
+        <div>
+          <label>Start Date</label>
+          <input type="date" class="exp-start">
+        </div>
+        <div>
+          <label>End Date</label>
+          <input type="date" class="exp-end">
+        </div>
+      </div>
+    `;
+    container.appendChild(newExperience);
+  }
+
+  async function uploadFile(file, folderName) {
+    if (!file) return null;
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${folderName}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(fileName, file);
+    if (error) { console.error(error); alert("File upload failed."); return null; }
+    const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+    return data.publicUrl;
+  }
+
+  async function submitProfile() {
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const blurb = document.getElementById("blurb").value.trim();
+    const workMode = document.getElementById("workModeSelect").value;
+    const preferredLocation = document.getElementById("LocationSelect").value.trim();
+
+    if (!name || !email || !phone) {
+      alert("Please enter your name, email, and phone number.");
+      return;
+    }
+
+    const profilePhoto = document.getElementById("profilePhoto").files[0];
+    const resumeFile   = document.getElementById("resumeFile").files[0];
+    const profilePhotoUrl = await uploadFile(profilePhoto, "profile-photos");
+    const resumeUrl       = await uploadFile(resumeFile, "resumes");
+
+    const { data: candidate, error } = await supabaseClient
+      .from("candidate")
+      .insert([{ name, email, phone, blurb, profile_photo_url: profilePhotoUrl, resume_url: resumeUrl, working_mode: workMode, preferred_location: preferredLocation }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      alert("Error saving profile. Check if this email or phone already exists.");
+      return;
+    }
+
+    const candidateId = candidate.candidate_id;
+
+    // Education
+    const educationData = [];
+    document.querySelectorAll("#educationContainer .entry-set").forEach(e => {
+      const level     = e.querySelector(".edu-level").value.trim();
+      const degree    = e.querySelector(".edu-degree").value.trim();
+      const startDate = e.querySelector(".edu-start").value || null;
+      const endDate   = e.querySelector(".edu-end").value || null;
+      if (level || degree || startDate || endDate) {
+        educationData.push({ candidate_id: candidateId, level, degree, start_date: startDate, end_date: endDate });
+      }
+    });
+    if (educationData.length > 0) await supabaseClient.from("education").insert(educationData);
+
+    // Experience
+    const experienceData = [];
+    document.querySelectorAll("#experienceContainer .entry-set").forEach(e => {
+      const jobTitle  = e.querySelector(".exp-title").value.trim();
+      const company   = e.querySelector(".exp-company").value.trim();
+      const startDate = e.querySelector(".exp-start").value || null;
+      const endDate   = e.querySelector(".exp-end").value || null;
+      if (jobTitle || company || startDate || endDate) {
+        experienceData.push({ candidate_id: candidateId, job_title: jobTitle, company, start_date: startDate, end_date: endDate });
+      }
+    });
+    if (experienceData.length > 0) await supabaseClient.from("experience").insert(experienceData);
+
+    // Skills — read from data-skill attribute on each tag
+    const skillData = [];
+    document.querySelectorAll("#skillTags span").forEach(s => {
+      skillData.push({ candidate_id: candidateId, skill_name: s.dataset.skill });
+    });
+    if (skillData.length > 0) await supabaseClient.from("skill").insert(skillData);
+
+    alert(`Profile created successfully! Your Profile ID is ${candidateId}`);
+    window.location.href = `CandidateProfile.html?id=${candidateId}`;
+  }
+
+  // ── Kick off ─────────────────────────────────────────────
+  loadJobTitles();
+  loadSkills();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Profile — TalentMatch</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/employer-profile.css" />
+</head>
+
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
+
+  <div class="nav-actions">
+    <button id="membershipBtn" class="membership-btn" onclick="becomeCompanyMember()">
+      Become a Member
+    </button>
+    <a id="backLink" href="EmployerHome.html" class="back-link">← Employer Home</a>
+  </div>
+</nav>
+
+<main class="profile-page">
+  <div class="profile-card">
+
+    <section class="top-section">
+      <div class="logo-box" id="logoBox">
+        <div class="placeholder">🏢</div>
+      </div>
+
+      <div>
+        <h1 id="companyName">Loading...</h1>
+
+        <div class="details">
+          <div id="industry"></div>
+          <div id="location"></div>
+        </div>
+
+        <div class="description" id="description">
+          Loading company profile...
+        </div>
+
+        <a id="website" class="website-btn hidden" target="_blank">
+          Visit Website
+        </a>
+      </div>
+    </section>
+
+    <div class="content-grid">
+
+      <div>
+        <h2>Job Listings</h2>
+        <div id="jobListings">
+          <div class="empty">Loading job listings...</div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h2>Company Details</h2>
+        <div class="details">
+          <div id="companyId"></div>
+          <div id="createdAt"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+const supabaseClient = supabase.createClient(
+  "https://bzakjtfktgdlmmevbnfo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+);
+
+// ── ID resolution ─────────────────────────────────────────
+function getId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id") || localStorage.getItem("companyId");
+}
+
+// ── Membership ────────────────────────────────────────────
+function setMembershipButtonAsMember() {
+  const btn = document.getElementById("membershipBtn");
+  btn.textContent = "You are a Member";
+  btn.classList.add("active");
+  btn.disabled = true;
+}
+
+function setMembershipButtonAsNonMember() {
+  const btn = document.getElementById("membershipBtn");
+  btn.textContent = "Become a Member";
+  btn.classList.remove("active");
+  btn.disabled = false;
+}
+
+async function loadCompanyMembershipStatus() {
+  const companyId = getId();
+  if (!companyId) return;
+
+  const { data, error } = await supabaseClient
+    .from("company")
+    .select("is_member")
+    .eq("company_id", companyId)
+    .single();
+
+  if (error) { console.error("Membership load error:", error); return; }
+
+  data.is_member ? setMembershipButtonAsMember() : setMembershipButtonAsNonMember();
+}
+
+async function becomeCompanyMember() {
+  const companyId = getId();
+  if (!companyId) { alert("No company profile ID found."); return; }
+
+  const { error } = await supabaseClient
+    .from("company")
+    .update({ is_member: true })
+    .eq("company_id", companyId);
+
+  if (error) {
+    console.error("Membership update error:", error);
+    alert("Could not activate membership.");
+    return;
+  }
+
+  setMembershipButtonAsMember();
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function formatDate(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleDateString("en-AU", {
+    year: "numeric", month: "short", day: "numeric"
+  });
+}
+
+function workModeClass(mode) {
+  if (!mode) return "badge-mode-other";
+  return "badge-mode-" + mode.replace(/\s+/g, "-");
+}
+
+// ── Company profile ───────────────────────────────────────
+async function loadCompanyProfile() {
+  const id = getId();
+
+  if (!id) {
+    document.getElementById("companyName").textContent = "No company selected";
+    document.getElementById("description").textContent =
+      "Open this page using EmployerProfile.html?id=1 or log in as an employer.";
+    document.getElementById("jobListings").innerHTML =
+      `<div class="empty">No company loaded.</div>`;
+    return;
+  }
+
+  document.getElementById("backLink").href = `EmployerHome.html?company_id=${id}`;
+
+  const { data: company, error } = await supabaseClient
+    .from("company")
+    .select("*")
+    .eq("company_id", id)
+    .single();
+
+  if (error || !company) {
+    console.error("Company load error:", error);
+    document.getElementById("companyName").textContent = "Company not found";
+    document.getElementById("description").textContent =
+      "Check that the company ID exists in Supabase.";
+    return;
+  }
+
+  document.getElementById("companyName").textContent   = company.name        || "Unnamed Company";
+  document.getElementById("industry").textContent      = company.industry    || "";
+  document.getElementById("location").textContent      = company.location    || "";
+  document.getElementById("description").textContent   = company.description || "No company description added.";
+  document.getElementById("companyId").textContent     = `Company ID: ${company.company_id}`;
+  document.getElementById("createdAt").textContent     = company.created_at
+    ? `Member since: ${formatDate(company.created_at)}`
+    : "";
+
+  if (company.logo_url) {
+    document.getElementById("logoBox").innerHTML =
+      `<img src="${company.logo_url}" alt="${company.name} logo">`;
+  }
+
+  if (company.website) {
+    const websiteLink = document.getElementById("website");
+    websiteLink.href = company.website;
+    websiteLink.classList.remove("hidden");
+  }
+
+  loadJobListings(company.company_id);
+}
+
+// ── Job listings ──────────────────────────────────────────
+async function loadJobListings(companyId) {
+  const container = document.getElementById("jobListings");
+
+  const { data: jobs, error } = await supabaseClient
+    .from("job_listing")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Job listings load error:", error);
+    container.innerHTML = `<div class="empty">Could not load job listings.</div>`;
+    return;
+  }
+
+  if (!jobs || jobs.length === 0) {
+    container.innerHTML = `<div class="empty">No job listings posted yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = jobs.map(job => {
+    // required_skills is stored as comma-separated text
+    const skillTags = job.required_skills
+      ? job.required_skills
+          .split(",")
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map(s => `<span class="skill-tag">${s}</span>`)
+          .join("")
+      : `<span class="skill-tag muted">Not specified</span>`;
+
+    return `
+      <div class="job-card">
+
+        <div class="job-card-top">
+          <div>
+            <div class="job-title">${job.job_title || "Untitled Role"}</div>
+            <div class="job-meta">
+              ${job.work_mode
+                ? `<span class="badge ${workModeClass(job.work_mode)}">${job.work_mode}</span>`
+                : ""}
+              ${job.job_location
+                ? `<span class="badge badge-location">📍 ${job.job_location}</span>`
+                : ""}
+              ${job.years_experience != null
+                ? `<span class="badge badge-exp">⏱ ${job.years_experience}+ yr${job.years_experience !== 1 ? "s" : ""} exp</span>`
+                : ""}
+            </div>
+          </div>
+          <div class="job-date">${formatDate(job.created_at)}</div>
+        </div>
+
+        ${job.job_description ? `
+          <p class="job-description">${job.job_description}</p>
+        ` : ""}
+
+        <div class="job-detail-row">
+          <div class="job-detail">
+            <span class="detail-label">Required Education</span>
+            <span class="detail-value">${job.required_education || "Not specified"}</span>
+          </div>
+        </div>
+
+        <div class="job-detail">
+          <span class="detail-label">Required Skills</span>
+          <div class="skill-tags">${skillTags}</div>
+        </div>
+
+      </div>`;
+  }).join("");
+}
+
+// ── Init ──────────────────────────────────────────────────
+loadCompanyProfile();
+loadCompanyMembershipStatus();
+</script>
+
+</body>
+</html>

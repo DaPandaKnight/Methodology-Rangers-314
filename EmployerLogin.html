@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Login — TalentMatch</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../css/employer-login.css" />
+</head>
+
+<body>
+
+  <div class="login-card">
+    <h1>Employer Login</h1>
+    <p>Enter your company name to access your employer profile</p>
+
+    <input type="text" id="companyNameInput" placeholder="Enter your company name">
+
+    <button onclick="login()">Login</button>
+
+    <div class="link">
+      Don’t have a profile? <a href="EmployerCreate.html">Create one</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://bzakjtfktgdlmmevbnfo.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
+    );
+
+    async function login() {
+      const companyName = document.getElementById("companyNameInput").value.trim();
+
+      if (!companyName) {
+        alert("Please enter your company name.");
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("company")
+        .select("company_id")
+        .eq("name", companyName)
+        .single();
+
+      if (error || !data) {
+        alert("No employer profile found with that company name.");
+        return;
+      }
+
+      const companyId = data.company_id;
+
+      // Save logged-in employer ID
+      localStorage.setItem("companyId", companyId);
+
+      // Go to employer home page
+      window.location.href = "EmployerHome.html";
+    }
+  </script>
+
+</body>
+
+</html>

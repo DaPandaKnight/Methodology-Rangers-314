@@ -40,51 +40,35 @@
             <label>Industry</label>
             <select id="companyIndustry" required>
               <option value="">Select industry</option>
-              <option>Information Technology</option>
-              <option>Finance</option>
+              <option>Technology</option>
+			  <option>Artificial Intelligence</option>
+              <option>Fintech</option>
               <option>Healthcare</option>
-              <option>Education</option>
-              <option>Engineering</option>
-              <option>Marketing</option>
-              <option>Government</option>
+              <option>Consulting</option>
+              <option>Finance</option>
+              <option>Telecommunications</option>
+              <option>Mining & Resources</option>
+			  <option>Automotive & Energy</option>
+			  <option>Aerospace</option>
+			  <option>HR & Recruitment</option>
+			  <option>Real Estate Tech</option>
+			  <option>Biotechnology</option>
+			  <option>Professional Legal Services</option>
               <option>Other</option>
             </select>
           </div>
         </div>
+		
+		<div id="otherIndustryContainer" style="display: none; margin-top: 10px;">
+		  <label for="otherIndustry">Please specify your industry:</label>
+		  <input type="text" id="otherIndustry" />
+		</div>
 
         <label>Company Website</label>
         <input type="url" id="companyWebsite" placeholder="https://example.com">
 
         <label>Company Location</label>
         <input type="text" id="companyLocation" placeholder="Wollongong, NSW">
-      </section>
-
-      <section class="form-card">
-        <h2>Employer Contact</h2>
-
-        <div class="two-column">
-          <div>
-            <label>Contact Full Name</label>
-            <input type="text" id="contactName" required>
-          </div>
-
-          <div>
-            <label>Position / Role</label>
-            <input type="text" id="contactPosition" placeholder="Hiring Manager">
-          </div>
-        </div>
-
-        <div class="two-column">
-          <div>
-            <label>Email</label>
-            <input type="email" id="contactEmail" required>
-          </div>
-
-          <div>
-            <label>Phone Number</label>
-            <input type="tel" id="contactPhone">
-          </div>
-        </div>
       </section>
 
       <section class="form-card">
@@ -120,6 +104,20 @@
   );
 
   const COMPANY_BUCKET = "company-files";
+  const companyIndustrySelect = document.getElementById("companyIndustry");
+  const otherIndustryContainer = document.getElementById("otherIndustryContainer");
+  const otherIndustryInput = document.getElementById("otherIndustry");
+
+  companyIndustrySelect.addEventListener("change", function () {
+      if (this.value.toLowerCase() === "other") {
+          otherIndustryContainer.style.display = "block";
+          otherIndustryInput.required = true;
+      } else {
+          otherIndustryContainer.style.display = "none";
+          otherIndustryInput.required = false;
+          otherIndustryInput.value = ""; // clear previous value
+      }
+  });
 
   document.getElementById("companyLogo").addEventListener("change", function(event) {
     const file = event.target.files[0];
@@ -163,8 +161,14 @@
     event.preventDefault();
 
     const companyName = document.getElementById("companyName").value.trim();
-    const industry = document.getElementById("companyIndustry").value;
-    const website = document.getElementById("companyWebsite").value.trim();
+	let industry = companyIndustrySelect.value;
+	if (industry.toLowerCase() === "other") {
+	    industry = otherIndustryInput.value.trim();
+	    if (!industry) {
+	        alert("Please specify your industry.");
+	        return;
+	    }
+	}    const website = document.getElementById("companyWebsite").value.trim();
     const location = document.getElementById("companyLocation").value.trim();
     const description = document.getElementById("companyDescription").value.trim();
 

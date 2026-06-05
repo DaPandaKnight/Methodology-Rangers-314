@@ -8,14 +8,61 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/employer-home.css" />
+  <style>
+    /* ── Job listing filter panel ───────────────────────── */
+    .listing-filter-panel {
+      background: var(--surface, #FDFCFA);
+      border: 1px solid rgba(26,26,24,0.12);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;
+    }
+    .listing-filter-panel h3 { font-size: 15px; font-weight: 500; margin: 0 0 12px; }
+    .listing-filter-panel p.hint { font-size: 13px; color: var(--ink-soft, #5C5C54); margin: 0 0 14px; }
+    .listing-radios { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+    .listing-radios label {
+      display: flex; align-items: center; gap: 10px; font-size: 14px;
+      cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: background 0.12s;
+    }
+    .listing-radios label:hover { background: rgba(26,26,24,0.04); }
+    .listing-radios input[type="radio"] { width: 15px; height: 15px; accent-color: #1A7F5A; flex-shrink: 0; }
+    .listing-filter-panel .no-listings { font-size: 13px; color: var(--ink-soft, #5C5C54); font-style: italic; }
 
+    /* ── Show more button ───────────────────────────────── */
+    .show-more-btn {
+      display: block; margin: 28px auto 0; padding: 12px 36px;
+      background: transparent; border: 1.5px solid rgba(26,26,24,0.18);
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      font-family: inherit; color: var(--ink, #1A1A18); cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .show-more-btn:hover { background: var(--ink, #1A1A18); color: #fff; border-color: var(--ink, #1A1A18); }
+
+    /* ── Top-10 note ────────────────────────────────────── */
+    .top10-note { font-size: 13px; color: var(--ink-soft, #5C5C54); margin-bottom: 4px; }
+
+    /* ── Filter bar ─────────────────────────────────────── */
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 14px; align-items: center;
+    }
+    .filter-bar select {
+      padding: 7px 12px; border: 1.5px solid rgba(26,26,24,0.18);
+      border-radius: 8px; font-size: 13px; font-family: inherit;
+      background: #fff; color: var(--ink, #1A1A18); cursor: pointer; min-width: 160px;
+    }
+    .filter-bar select:focus { outline: none; border-color: var(--ink, #1A1A18); }
+    .filter-bar .clear-btn {
+      padding: 7px 14px; border: 1.5px solid rgba(26,26,24,0.18);
+      border-radius: 8px; font-size: 13px; font-family: inherit;
+      background: transparent; color: var(--ink-soft, #5C5C54); cursor: pointer;
+    }
+    .filter-bar .clear-btn:hover { border-color: var(--ink, #1A1A18); color: var(--ink, #1A1A18); }
+  </style>
 </head>
 
 <body>
 
   <nav>
-    <a href="index.html" class="nav-logo">Talent<span>Match</span></a>
-
+    <a href="../index.html" class="nav-logo">Talent<span>Match</span></a>
     <div class="nav-links">
       <a href="#" id="employerProfileBtn" class="profile-btn">Profile</a>
       <button class="logout-btn" onclick="logout()">Logout</button>
@@ -30,64 +77,86 @@
 
   <section class="dashboard-section">
     <div class="dashboard-grid">
-
       <div class="dashboard-card">
         <div class="dashboard-icon">🏢</div>
         <h2>Company Profile</h2>
         <p>View and manage your employer details, company information, contacts, and logo.</p>
         <a href="#" id="companyProfileCardLink">Open profile →</a>
       </div>
-
       <div class="dashboard-card">
         <div class="dashboard-icon">📝</div>
         <h2>Create Job Listing</h2>
         <p>Add a new job listing so candidates can find and apply for your open positions.</p>
         <a id="createJobListingLink" href="#">Create Job Listing</a>
       </div>
-
-
     </div>
   </section>
 
-  <div class="section-divider" id="candidates">
-    <span>Candidate matches</span>
-  </div>
+  <div class="section-divider" id="candidates"><span>Candidate matches</span></div>
 
   <section class="candidates-section">
     <div class="candidates-header">
       <div>
-        <h2>Latest candidates</h2>
-        <p id="results-count">Showing all candidate profiles</p>
+        <h2>Candidate matches</h2>
+        <p id="results-count">Loading…</p>
       </div>
     </div>
 
+    <!-- Job listing selector for TalentMatch -->
+    <div class="listing-filter-panel" id="listingFilterPanel" style="display:none;">
+      <h3>Select job listing</h3>
+      <p class="hint">Choose one of your job listings — TalentMatch will score and rank all candidates against it.</p>
+      <div class="listing-radios" id="listingRadios"></div>
+    </div>
+
+    <!-- Search -->
     <div class="search-bar">
       <input type="text" id="search-input" placeholder="Search by name, skill, role, or location…" />
-      <button class="filter-btn active" data-mode="All">All</button>
-      <button class="filter-btn" data-mode="Remote">Remote</button>
-      <button class="filter-btn" data-mode="Hybrid">Hybrid</button>
-      <button class="filter-btn" data-mode="On-site">On-site</button>
+      <button class="filter-btn" id="btn-talentmatch">TalentMatch</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <select id="filter-mode" onchange="onFilterChange()">
+        <option value="">All work modes</option>
+        <option value="Remote">Remote</option>
+        <option value="Hybrid">Hybrid</option>
+        <option value="On-site">On-site</option>
+      </select>
+
+      <select id="filter-location" onchange="onFilterChange()">
+        <option value="">All locations</option>
+      </select>
+
+      <select id="filter-title" onchange="onFilterChange()">
+        <option value="">All job titles</option>
+      </select>
+
+      <button class="clear-btn" onclick="clearFilters()">Clear filters</button>
     </div>
 
     <div class="candidate-grid" id="candidate-grid"></div>
+    <div id="show-more-container" style="display:none; text-align:center; margin-top:28px;">
+      <button id="show-more-btn" class="show-more-btn"></button>
+    </div>
   </section>
 
+  <!-- Fuse.js for fuzzy search -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script>
-    // ── Supabase ─────────────────────────────────────────────
     const supabaseClient = supabase.createClient(
       "https://bzakjtfktgdlmmevbnfo.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YWtqdGZrdGdkbG1tZXZibmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NDQwMzYsImV4cCI6MjA5MzQyMDAzNn0.z6aTOm35-BLJ43B_rUknD8yilNu-jkOId6RcR68U-B0"
     );
 
-    // ── Nav links ────────────────────────────────────────────
-    const companyId = localStorage.getItem("companyId");
-    const createJobListingLink    = document.getElementById("createJobListingLink");
-    const employerProfileBtn      = document.getElementById("employerProfileBtn");
-    const companyProfileCardLink  = document.getElementById("companyProfileCardLink");
+    const companyId              = localStorage.getItem("companyId");
+    const createJobListingLink   = document.getElementById("createJobListingLink");
+    const employerProfileBtn     = document.getElementById("employerProfileBtn");
+    const companyProfileCardLink = document.getElementById("companyProfileCardLink");
 
     if (companyId) {
-      createJobListingLink.href   = `JobListingCreate.html?company_id=${companyId}`;
+      createJobListingLink.href   = `CreateJobListing.html?company_id=${companyId}`;
       employerProfileBtn.href     = `EmployerProfile.html?id=${companyId}`;
       companyProfileCardLink.href = `EmployerProfile.html?id=${companyId}`;
     } else {
@@ -101,36 +170,212 @@
       window.location.href = "EmployerLogin.html";
     }
 
+    const PAGE_SIZE = 24;
+
     // ── State ────────────────────────────────────────────────
-    let allCandidates = [];
-    let activeMode    = "All";
-    let searchQuery   = "";
+    let isMember          = false;
+    let allCandidates     = [];
+    let scoredCandidates  = [];
+    let companyListings   = [];
+    let selectedListingId = null;   // single listing chosen for TalentMatch
+    let topSearch         = false;  // true when TalentMatch results are active
+    let visibleCount      = PAGE_SIZE;
+    let fuseInstance      = null;
+
+    // ── Active filters ───────────────────────────────────────
+    let filterMode     = "";
+    let filterLocation = "";
+    let filterTitle    = "";
+    let searchQuery    = "";
+
+    // ── Build Fuse index over scored candidates ──────────────
+    // Searches across name, skills, job titles, education, location
+    function buildFuse(candidates) {
+      fuseInstance = new Fuse(candidates, {
+        threshold:      0.4,
+        ignoreLocation: true,
+        keys: [
+          { name: "name",                        weight: 3 },
+          { name: "skills",                      weight: 2 },
+          { name: "experience_titles",           weight: 2 },
+          { name: "preferred_location",          weight: 1.5 },
+          { name: "education_degrees",           weight: 1 },
+          { name: "working_mode",                weight: 0.5 }
+        ]
+      });
+    }
+
+    // ── Flatten nested arrays for Fuse indexing ──────────────
+    function flattenForFuse(candidates) {
+      return candidates.map(c => ({
+        ...c,
+        experience_titles: c.experience.map(e => e.job_title).filter(Boolean).join(" "),
+        education_degrees: c.education.map(e => [e.level, e.degree].filter(Boolean).join(" ")).join(" ")
+      }));
+    }
+
+    // ── Populate location + title dropdowns ──────────────────
+    function buildDropdowns(candidates) {
+      const locations = [...new Set(
+        candidates.map(c => c.preferred_location).filter(Boolean)
+      )].sort();
+
+      const titles = [...new Set(
+        candidates.flatMap(c => c.experience.map(e => e.job_title)).filter(Boolean)
+      )].sort();
+
+      const locSel = document.getElementById("filter-location");
+      const titSel = document.getElementById("filter-title");
+
+      // Clear existing options beyond the first placeholder
+      while (locSel.options.length > 1) locSel.remove(1);
+      while (titSel.options.length > 1) titSel.remove(1);
+
+      locations.forEach(l => { const o = document.createElement("option"); o.value = l; o.textContent = l; locSel.appendChild(o); });
+      titles.forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; titSel.appendChild(o); });
+    }
+
+    // ── Apply search + all filters to a candidate list ───────
+    function applyFilters(source) {
+      let results = source;
+
+      // 1. Keyword / fuzzy search
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        // Exact substring match first
+        const exact = source.filter(c =>
+          c.name.toLowerCase().includes(q) ||
+          (c.preferred_location || "").toLowerCase().includes(q) ||
+          (c.working_mode || "").toLowerCase().includes(q) ||
+          c.skills.some(s => s.toLowerCase().includes(q)) ||
+          c.experience.some(e => (e.job_title || "").toLowerCase().includes(q) || (e.company || "").toLowerCase().includes(q)) ||
+          c.education.some(e => (e.degree || "").toLowerCase().includes(q) || (e.level || "").toLowerCase().includes(q))
+        );
+        if (exact.length > 0) {
+          results = exact;
+        } else if (fuseInstance) {
+          results = fuseInstance.search(searchQuery).map(r => r.item);
+        } else {
+          results = [];
+        }
+      }
+
+      // 2. Work mode filter
+      if (filterMode)     results = results.filter(c => c.working_mode === filterMode);
+
+      // 3. Location filter
+      if (filterLocation) results = results.filter(c => c.preferred_location === filterLocation);
+
+      // 4. Job title filter — matches any experience row
+      if (filterTitle)    results = results.filter(c => c.experience.some(e => e.job_title === filterTitle));
+
+      return results;
+    }
+
+    function onFilterChange() {
+      filterMode     = document.getElementById("filter-mode").value;
+      filterLocation = document.getElementById("filter-location").value;
+      filterTitle    = document.getElementById("filter-title").value;
+      visibleCount   = PAGE_SIZE;
+      renderCandidates();
+    }
+
+    function clearFilters() {
+      document.getElementById("filter-mode").value     = "";
+      document.getElementById("filter-location").value = "";
+      document.getElementById("filter-title").value    = "";
+      document.getElementById("search-input").value    = "";
+      filterMode = filterLocation = filterTitle = searchQuery = "";
+      visibleCount = PAGE_SIZE;
+      renderCandidates();
+    }
+
+    // ── Scoring ──────────────────────────────────────────────
+    function eduTier(str) {
+      if (!str) return 0;
+      const s = str.toLowerCase();
+      if (s.includes("phd") || s.includes("doctor"))        return 6;
+      if (s.includes("master"))                              return 5;
+      if (s.includes("graduate"))                            return 4;
+      if (s.includes("bachelor") || s.includes("degree"))   return 3;
+      if (s.includes("advanced diploma"))                    return 2;
+      if (s.includes("diploma") || s.includes("associate")) return 2;
+      if (s.includes("cert"))                                return 1;
+      return 0;
+    }
+
+    function calcYearsExp(rows) {
+      if (!rows || rows.length === 0) return 0;
+      const now = new Date(); let ms = 0;
+      for (const e of rows) {
+        const s = e.start_date ? new Date(e.start_date) : null;
+        const en = e.end_date  ? new Date(e.end_date)   : now;
+        if (s && en > s) ms += (en - s);
+      }
+      return ms / (1000 * 60 * 60 * 24 * 365.25);
+    }
+
+    function scoreCandidate(candidate, listing) {
+      const candidateYears = calcYearsExp(candidate.experience);
+      const requiredYears  = listing.years_experience ?? 0;
+      if (candidateYears < requiredYears) return null;
+
+      const requiredEdu = (listing.required_education || "").toLowerCase();
+      if (requiredEdu) {
+        const hasEdu = candidate.education.some(e =>
+          (e.degree || "").toLowerCase().includes(requiredEdu) ||
+          requiredEdu.includes((e.degree || "").toLowerCase())
+        );
+        if (!hasEdu) return null;
+      }
+
+      let score = 0;
+
+      if (candidate.experience.length > 0 && listing.job_title) {
+        const jt = listing.job_title.toLowerCase();
+        if (candidate.experience.some(e => (e.job_title || "").toLowerCase().split(/\s+/).some(w => w.length > 2 && jt.includes(w)))) score += 5;
+      }
+      if (requiredEdu) {
+        if (candidate.education.some(e => (e.degree || "").toLowerCase().includes(requiredEdu) || requiredEdu.includes((e.degree || "").toLowerCase()))) score += 4;
+      }
+      const cEduTier = candidate.education.length > 0 ? Math.max(...candidate.education.map(e => eduTier(e.level))) : 0;
+      const lEduTier = eduTier(listing.required_education);
+      if (lEduTier === 0) score += 3; else if (cEduTier >= lEduTier) score += 3;
+      if (requiredYears === 0 || candidateYears >= requiredYears) score += 3;
+      if (candidate.preferred_location && listing.job_location) {
+        const cl = candidate.preferred_location.toLowerCase(), jl = listing.job_location.toLowerCase();
+        if (cl.includes(jl) || jl.includes(cl)) score += 2;
+      }
+      if (candidate.working_mode && listing.work_mode && candidate.working_mode.toLowerCase() === listing.work_mode.toLowerCase()) score += 2;
+      const ls = (listing.required_skills || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+      if (candidate.skills.length > 0 && ls.length > 0) {
+        const cs = candidate.skills.map(s => s.toLowerCase());
+        if (ls.some(l => cs.some(c => c.includes(l) || l.includes(c)))) score += 1;
+      }
+      return score;
+    }
+
+    function scoreAllCandidates() {
+      const listing = companyListings.find(l => l.job_id === selectedListingId);
+      if (!listing) { scoredCandidates = []; return; }
+      const result = [];
+      for (const c of allCandidates) {
+        const s = scoreCandidate(c, listing);
+        if (s !== null) result.push({ ...c, score: s });
+      }
+      result.sort((a, b) => b.score - a.score);
+      scoredCandidates = result;
+    }
 
     // ── Helpers ──────────────────────────────────────────────
-    // Total years of experience derived from experience rows
-    function calcYearsExp(experienceRows) {
-      if (!experienceRows || experienceRows.length === 0) return null;
-      let totalDays = 0;
-      const now = new Date();
-      for (const e of experienceRows) {
-        const start = e.start_date ? new Date(e.start_date) : null;
-        const end   = e.end_date   ? new Date(e.end_date)   : now;
-        if (start) totalDays += (end - start) / 86400000;
-      }
-      const years = Math.floor(totalDays / 365);
-      return years;
-    }
-
     function nameInitials(name) {
-      return name
-        .split(" ")
-        .slice(0, 2)
-        .map(w => w[0])
-        .join("")
-        .toUpperCase();
+      return name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+    }
+    function fmtYears(years) {
+      const y = Math.floor(years);
+      return `${y} yr${y !== 1 ? "s" : ""}`;
     }
 
-    // ── Skeleton loading ─────────────────────────────────────
     function showLoading() {
       document.getElementById("candidate-grid").innerHTML = Array(6).fill(`
         <div class="candidate-card" style="pointer-events:none; gap:14px;">
@@ -155,129 +400,125 @@
         </div>`).join("");
     }
 
+    function candidateCardHTML(c) {
+      const yearsExp  = calcYearsExp(c.experience);
+      const modeClass = (c.working_mode || "On-site").replace(/\s+/g, "-");
+      const avatarInner = c.profile_photo_url ? `<img src="${c.profile_photo_url}" alt="${c.name}">` : nameInitials(c.name);
+      const eduLines = c.education.length > 0 ? c.education.map(e => [e.level, e.degree].filter(Boolean).join(" — ")).join("<br>") : "Not provided";
+      const expLines = c.experience.length > 0 ? c.experience.map(e => [e.job_title, e.company ? `@ ${e.company}` : null].filter(Boolean).join(" ")).join("<br>") : "Not provided";
+      const skillsHtml = c.skills.length > 0 ? c.skills.map(s => `<span class="skill-tag">${s}</span>`).join("") : `<span class="skill-tag" style="color:var(--ink-muted);">None listed</span>`;
+
+      return `
+        <div class="candidate-card" onclick="window.location.href='CandidateProfile.html?id=${c.candidate_id}'">
+          <div class="candidate-card-top">
+            <div class="candidate-avatar">${avatarInner}</div>
+            <div>
+              <div class="candidate-name">${c.name}</div>
+              <div class="candidate-contact">
+                ${c.email ? `✉️ ${c.email}<br>` : ""}
+                ${c.phone ? `📞 ${c.phone}` : ""}
+              </div>
+            </div>
+          </div>
+          <div class="candidate-meta">
+            ${c.working_mode ? `<span class="badge badge-mode-${modeClass}">${c.working_mode}</span>` : ""}
+            ${c.preferred_location ? `<span class="badge badge-location">📍 ${c.preferred_location}</span>` : ""}
+            ${yearsExp > 0 ? `<span class="badge badge-exp">⏱ ${fmtYears(yearsExp)} exp</span>` : ""}
+          </div>
+          <div class="detail-divider"></div>
+          <div class="detail-section">
+            <div class="detail-label">Education</div>
+            <div class="detail-value">${eduLines}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Work Experience</div>
+            <div class="detail-value">${expLines}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Skills</div>
+            <div class="skill-tags">${skillsHtml}</div>
+          </div>
+          <div class="candidate-card-footer">
+            <button class="btn-view" onclick="event.stopPropagation(); window.location.href='CandidateProfile.html?id=${c.candidate_id}'">View profile</button>
+          </div>
+        </div>`;
+    }
+
     // ── Render ───────────────────────────────────────────────
     function renderCandidates() {
       const grid  = document.getElementById("candidate-grid");
       const count = document.getElementById("results-count");
-      const q     = searchQuery.toLowerCase();
 
-      const filtered = allCandidates.filter(c => {
-        const modeMatch = activeMode === "All" || c.working_mode === activeMode;
-        const textMatch = !q ||
-          c.name.toLowerCase().includes(q) ||
-          (c.email || "").toLowerCase().includes(q) ||
-          (c.preferred_location || "").toLowerCase().includes(q) ||
-          c.skills.some(s => s.toLowerCase().includes(q)) ||
-          c.education.some(e =>
-            (e.degree || "").toLowerCase().includes(q) ||
-            (e.level  || "").toLowerCase().includes(q)
-          ) ||
-          c.experience.some(e =>
-            (e.job_title || "").toLowerCase().includes(q) ||
-            (e.company   || "").toLowerCase().includes(q)
-          );
-        return modeMatch && textMatch;
-      });
+      const source   = topSearch ? scoredCandidates : allCandidates;
+      const filtered = applyFilters(source);
 
-      count.textContent = filtered.length === allCandidates.length
-        ? `Showing all ${allCandidates.length} candidate profiles`
-        : `${filtered.length} of ${allCandidates.length} candidates`;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <p>🔍</p>
-            <p>No candidates match your search.</p>
-          </div>`;
+      if (topSearch && !isMember) {
+        // Non-member + TalentMatch active: cap at top 10
+        const top10 = filtered.slice(0, 10);
+        count.innerHTML = `<span class="top10-note">Your top ${top10.length} recommended candidates. Non-members see top 10 only — upgrade for unlimited access.</span>`;
+        grid.innerHTML  = top10.length > 0 ? top10.map(candidateCardHTML).join("") : `<div class="empty-state"><p>🔍</p><p>No candidates match your current job.</p></div>`;
+        document.getElementById("show-more-container").style.display = "none";
         return;
       }
 
-      grid.innerHTML = filtered.map(c => {
-        const yearsExp  = calcYearsExp(c.experience);
-        const modeClass = (c.working_mode || "On-site").replace(/\s+/g, "-");
+      // Member (any mode) or non-member browsing: paginated
+      const slice     = filtered.slice(0, visibleCount);
+      const remaining = filtered.length - slice.length;
 
-        // Avatar: photo if available, else initials
-        const avatarInner = c.profile_photo_url
-          ? `<img src="${c.profile_photo_url}" alt="${c.name}">`
-          : nameInitials(c.name);
+      if (topSearch) {
+        count.textContent = filtered.length === scoredCandidates.length
+          ? `${filtered.length} TalentMatch result${filtered.length !== 1 ? "s" : ""}`
+          : `${filtered.length} of ${scoredCandidates.length} TalentMatch results`;
+      } else {
+        count.textContent = filtered.length === allCandidates.length
+          ? `Showing ${slice.length} of ${allCandidates.length} candidate profiles`
+          : `${filtered.length} of ${allCandidates.length} candidates match`;
+      }
 
-        // Education lines: "Bachelor of Computer Science"
-        const eduLines = c.education.length > 0
-          ? c.education.map(e => [e.level, e.degree].filter(Boolean).join(" — ")).join("<br>")
-          : "Not provided";
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><p>🔍</p><p>No candidates match your current filters.</p></div>`;
+        document.getElementById("show-more-container").style.display = "none";
+        return;
+      }
 
-        // Experience lines: "Software Engineer @ Acme Corp"
-        const expLines = c.experience.length > 0
-          ? c.experience.map(e => {
-              const parts = [e.job_title, e.company ? `@ ${e.company}` : null].filter(Boolean);
-              return parts.join(" ");
-            }).join("<br>")
-          : "Not provided";
+      grid.innerHTML = slice.map(candidateCardHTML).join("");
 
-        // Skills
-        const skillsHtml = c.skills.length > 0
-          ? c.skills.map(s => `<span class="skill-tag">${s}</span>`).join("")
-          : `<span class="skill-tag" style="color:var(--ink-muted);">None listed</span>`;
-
-        return `
-          <div class="candidate-card" onclick="window.location.href='CandidateProfile.html?id=${c.candidate_id}'">
-
-            <div class="candidate-card-top">
-              <div class="candidate-avatar">${avatarInner}</div>
-              <div>
-                <div class="candidate-name">${c.name}</div>
-                <div class="candidate-contact">
-                  ${c.email  ? `✉️ ${c.email}<br>` : ""}
-                  ${c.phone  ? `📞 ${c.phone}` : ""}
-                </div>
-              </div>
-            </div>
-
-            <div class="candidate-meta">
-              ${c.working_mode
-                ? `<span class="badge badge-mode-${modeClass}">${c.working_mode}</span>`
-                : ""}
-              ${c.preferred_location
-                ? `<span class="badge badge-location">📍 ${c.preferred_location}</span>`
-                : ""}
-              ${yearsExp !== null
-                ? `<span class="badge badge-exp">⏱ ${yearsExp} yr${yearsExp !== 1 ? "s" : ""} exp</span>`
-                : ""}
-            </div>
-
-            <div class="detail-divider"></div>
-
-            <div class="detail-section">
-              <div class="detail-label">Education</div>
-              <div class="detail-value">${eduLines}</div>
-            </div>
-
-            <div class="detail-section">
-              <div class="detail-label">Work Experience</div>
-              <div class="detail-value">${expLines}</div>
-            </div>
-
-            <div class="detail-section">
-              <div class="detail-label">Skills</div>
-              <div class="skill-tags">${skillsHtml}</div>
-            </div>
-
-            <div class="candidate-card-footer">
-              <button class="btn-view" onclick="event.stopPropagation(); window.location.href='CandidateProfile.html?id=${c.candidate_id}'">
-                View profile
-              </button>
-            </div>
-
-          </div>`;
-      }).join("");
+      const showMoreContainer = document.getElementById("show-more-container");
+      const showMoreBtn       = document.getElementById("show-more-btn");
+      if (remaining > 0) {
+        showMoreBtn.textContent         = `Show more (${remaining} remaining)`;
+        showMoreContainer.style.display = "block";
+      } else {
+        showMoreContainer.style.display = "none";
+      }
     }
 
-    // ── Fetch all candidates + related data ──────────────────
+    // ── Listing selector panel ───────────────────────────────
+    function buildListingFilter() {
+      const panel  = document.getElementById("listingFilterPanel");
+      const radios = document.getElementById("listingRadios");
+
+      if (companyListings.length === 0) {
+        radios.innerHTML    = `<p class="no-listings">You have no active job listings yet. <a href="CreateJobListing.html?company_id=${companyId}">Create one →</a></p>`;
+        panel.style.display = "block";
+        return;
+      }
+
+      radios.innerHTML = companyListings.map((l, i) => `
+        <label>
+          <input type="radio" name="listingRadio" value="${l.job_id}"${i === 0 ? " checked" : ""}>
+          <span>${l.job_title} — ${l.job_location || "No location"}</span>
+        </label>
+      `).join("");
+
+      selectedListingId   = companyListings[0].job_id; // default to first listing
+      panel.style.display = "block";
+    }
+
+    // ── Load candidates ──────────────────────────────────────
     async function loadCandidates() {
       showLoading();
-
       try {
-        // Fetch all candidates
         const { data: candidates, error: candError } = await supabaseClient
           .from("candidate")
           .select("candidate_id, name, email, phone, profile_photo_url, working_mode, preferred_location")
@@ -286,18 +527,16 @@
         if (candError) throw candError;
 
         if (!candidates || candidates.length === 0) {
-          document.getElementById("candidate-grid").innerHTML = `
-            <div class="empty-state"><p>👤</p><p>No candidates have created profiles yet.</p></div>`;
+          document.getElementById("candidate-grid").innerHTML = `<div class="empty-state"><p>👤</p><p>No candidates have created profiles yet.</p></div>`;
           document.getElementById("results-count").textContent = "No candidate profiles found";
           return;
         }
 
         const ids = candidates.map(c => c.candidate_id);
 
-        // Parallel fetch of education, experience, skills
         const [
-          { data: eduData,  error: eduError  },
-          { data: expData,  error: expError  },
+          { data: eduData,   error: eduError   },
+          { data: expData,   error: expError   },
           { data: skillData, error: skillError }
         ] = await Promise.all([
           supabaseClient.from("education").select("candidate_id, level, degree, start_date, end_date").in("candidate_id", ids),
@@ -305,20 +544,15 @@
           supabaseClient.from("skill").select("candidate_id, skill_name").in("candidate_id", ids)
         ]);
 
-        if (eduError)   console.error("Education fetch error:",   eduError);
-        if (expError)   console.error("Experience fetch error:",  expError);
-        if (skillError) console.error("Skills fetch error:",      skillError);
+        if (eduError)   console.error("Education error:",  eduError);
+        if (expError)   console.error("Experience error:", expError);
+        if (skillError) console.error("Skill error:",      skillError);
 
-        // Group related rows by candidate_id
-        const eduMap   = {};
-        const expMap   = {};
-        const skillMap = {};
-
+        const eduMap = {}, expMap = {}, skillMap = {};
         (eduData   || []).forEach(r => { (eduMap[r.candidate_id]   = eduMap[r.candidate_id]   || []).push(r); });
         (expData   || []).forEach(r => { (expMap[r.candidate_id]   = expMap[r.candidate_id]   || []).push(r); });
         (skillData || []).forEach(r => { (skillMap[r.candidate_id] = skillMap[r.candidate_id] || []).push(r); });
 
-        // Attach related data to each candidate
         allCandidates = candidates.map(c => ({
           ...c,
           education:  eduMap[c.candidate_id]   || [],
@@ -326,37 +560,88 @@
           skills:    (skillMap[c.candidate_id] || []).map(s => s.skill_name)
         }));
 
+        // Build Fuse index and dropdowns over all candidates (TalentMatch scores on demand)
+        const flat = flattenForFuse(allCandidates);
+        buildFuse(flat);
+        buildDropdowns(allCandidates);
+
         renderCandidates();
 
       } catch (err) {
         console.error("Failed to load candidates:", err);
         document.getElementById("candidate-grid").innerHTML = `
-          <div class="empty-state">
-            <p>⚠️</p>
-            <p>Could not load candidates. Please try again later.</p>
-            <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small>
-          </div>`;
+          <div class="empty-state"><p>⚠️</p><p>Could not load candidates. Please try again later.</p>
+          <small style="font-size:11px; color:var(--ink-muted);">${err.message}</small></div>`;
       }
     }
 
-    // ── Filters & search ─────────────────────────────────────
-    document.querySelectorAll(".filter-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-        button.classList.add("active");
-        activeMode = button.dataset.mode;
-        renderCandidates();
-      });
-    });
+    // ── Main init ────────────────────────────────────────────
+    async function init() {
+      const { data: company, error: memberErr } = await supabaseClient
+        .from("company").select("is_member").eq("company_id", companyId).single();
+      if (!memberErr && company) isMember = company.is_member === true;
 
-    document.getElementById("search-input").addEventListener("input", e => {
-      searchQuery = e.target.value;
+      const { data: listings, error: listingErr } = await supabaseClient
+        .from("job_listing")
+        .select("job_id, job_title, job_location, required_education, required_skills, years_experience, work_mode")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false });
+
+      if (!listingErr && listings) {
+        companyListings = listings;
+        buildListingFilter(); // sets selectedListingId to the first listing
+      }
+
+      await loadCandidates();
+    }
+
+    // ── Show More ────────────────────────────────────────────
+    document.getElementById("show-more-btn").addEventListener("click", () => {
+      visibleCount += PAGE_SIZE;
       renderCandidates();
     });
 
-    // ── Kick off ─────────────────────────────────────────────
-    loadCandidates();
+    // ── Search ───────────────────────────────────────────────
+    document.getElementById("search-input").addEventListener("input", e => {
+      searchQuery  = e.target.value;
+      visibleCount = PAGE_SIZE;
+      renderCandidates();
+    });
 
+    // ── TalentMatch button ───────────────────────────────────
+    document.getElementById("btn-talentmatch").addEventListener("click", () => {
+      if (allCandidates.length === 0) return; // not loaded yet
+
+      const btn = document.getElementById("btn-talentmatch");
+
+      // Read whichever radio is currently checked
+      const selectedRadio = document.querySelector("#listingRadios input[type='radio']:checked");
+      if (!selectedRadio && companyListings.length > 0) return; // no listing selected
+
+      topSearch = !topSearch;
+
+      if (topSearch) {
+        // ── Activate TalentMatch ────────────────────────────
+        if (selectedRadio) selectedListingId = Number(selectedRadio.value);
+        console.log("Selected listing ID for TalentMatch:", selectedListingId);
+        scoreAllCandidates();                          // in-memory, synchronous
+        buildFuse(flattenForFuse(scoredCandidates));   // scope fuzzy search to matched set
+        visibleCount    = PAGE_SIZE;
+        btn.textContent = isMember ? "TalentMatch ✓" : "TalentMatch ✓ (Top 10)";
+        btn.classList.add("active");
+        renderCandidates();
+      } else {
+        // ── Deactivate TalentMatch ──────────────────────────
+        scoredCandidates = [];
+        visibleCount     = PAGE_SIZE;
+        btn.textContent  = "TalentMatch";
+        btn.classList.remove("active");
+        buildFuse(flattenForFuse(allCandidates));      // restore full Fuse index
+        renderCandidates();
+      }
+    });
+
+    init();
   </script>
 
 </body>

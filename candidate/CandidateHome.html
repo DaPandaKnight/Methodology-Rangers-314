@@ -352,26 +352,56 @@
       return ms / (1000 * 60 * 60 * 24 * 365.25);
     }
 
-    function educationSatisfied(degrees, req) {
+    function extractFieldKeywords(degreeStr) {
+      if (!degreeStr) return [];
+      return degreeStr.toLowerCase()
+        .replace(/\(.*?\)/g, ' ')
+        .replace(/\bmaster\b|\bmasters\b|\bbachelor\b|\bbachelors\b|\bdoctor\b|\bdoctoral\b|\bphd\b|\bdiploma\b|\bcertificate\b|\bgraduate\b|\bassociate\b|\badvanced\b|\bof\b|\bin\b|\bthe\b/g, ' ')
+        .split(/[\s,/&()\-]+/)
+        .map(w => w.trim())
+        .filter(w => w.length > 2);
+    }
+
+    function educationSatisfied(degrees, req, candidateEduTier, jobEduTier) {
       if (!req) return true;
       const r = req.toLowerCase();
-      return degrees.some(d => d.toLowerCase().includes(r) || r.includes(d.toLowerCase()));
+      return degrees.some(d => {
+        const dl = d.toLowerCase();
+        if (dl.includes(r) || r.includes(dl)) return true;
+        if (candidateEduTier >= jobEduTier && jobEduTier > 0) {
+          const candidateKeywords = extractFieldKeywords(d);
+          const reqKeywords       = extractFieldKeywords(req);
+          return reqKeywords.some(rk => candidateKeywords.some(ck => ck.includes(rk) || rk.includes(ck)));
+        }
+        return false;
+      });
     }
 
     function scoreJob(job, profile) {
-      if (!educationSatisfied(profile.degrees, job.requiredEducation)) return null;
+      if (!educationSatisfied(profile.degrees, job.requiredEducation, profile.eduTier, job.eduTier)) return null;
       if (profile.yearsExperience < job.yearsExp) return null;
       let score = 0;
       if (profile.pastJobTitles.length > 0 && job.title) {
         const jt = job.title.toLowerCase();
         if (profile.pastJobTitles.some(pt => pt.toLowerCase().split(/\s+/).some(w => w.length > 2 && jt.includes(w)))) score += 5;
       }
-
-      if (profile.eduTier > 0 && job.eduTier > 0) { if (profile.eduTier > job.eduTier) score += 3; }
+      if (profile.degrees.length > 0 && job.requiredEducation) {
+        const req = job.requiredEducation.toLowerCase();
+        const reqKeywords = extractFieldKeywords(job.requiredEducation);
+        const hasMatch = profile.degrees.some(d => {
+          const dl = d.toLowerCase();
+          if (dl.includes(req) || req.includes(dl)) return true;
+          if (profile.eduTier >= job.eduTier && job.eduTier > 0) {
+            const ck = extractFieldKeywords(d);
+            return reqKeywords.some(rk => ck.some(c => c.includes(rk) || rk.includes(c)));
+          }
+          return false;
+        });
+        if (hasMatch) score += 4;
+      }
+      if (profile.eduTier > 0 && job.eduTier > 0) { if (profile.eduTier >= job.eduTier) score += 3; }
       else if (job.eduTier === 0) score += 3;
-
-      if (job.yearsExp === 0 || profile.yearsExperience > job.yearsExp) score += 3;
-
+      if (job.yearsExp === 0 || profile.yearsExperience >= job.yearsExp) score += 3;
       if (profile.preferredLocation && job.location) {
         const cl = profile.preferredLocation.toLowerCase(), jl = job.location.toLowerCase();
         if (cl.includes(jl) || jl.includes(cl)) score += 2;

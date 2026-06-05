@@ -315,17 +315,37 @@
       return ms / (1000 * 60 * 60 * 24 * 365.25);
     }
 
+    function extractFieldKeywords(degreeStr) {
+      if (!degreeStr) return [];
+      return degreeStr.toLowerCase()
+        .replace(/\(.*?\)/g, ' ')
+        .replace(/\bmaster\b|\bmasters\b|\bbachelor\b|\bbachelors\b|\bdoctor\b|\bdoctoral\b|\bphd\b|\bdiploma\b|\bcertificate\b|\bgraduate\b|\bassociate\b|\badvanced\b|\bof\b|\bin\b|\bthe\b/g, ' ')
+        .split(/[\s,/&()\-]+/)
+        .map(w => w.trim())
+        .filter(w => w.length > 2);
+    }
+
     function scoreCandidate(candidate, listing) {
       const candidateYears = calcYearsExp(candidate.experience);
       const requiredYears  = listing.years_experience ?? 0;
       if (candidateYears < requiredYears) return null;
 
-      const requiredEdu = (listing.required_education || "").toLowerCase();
+      const cEduTier    = candidate.education.length > 0 ? Math.max(...candidate.education.map(e => eduTier(e.level))) : 0;
+      const lEduTier    = eduTier(listing.required_education);
+      const requiredEdu = listing.required_education || "";
+
       if (requiredEdu) {
-        const hasEdu = candidate.education.some(e =>
-          (e.degree || "").toLowerCase().includes(requiredEdu) ||
-          requiredEdu.includes((e.degree || "").toLowerCase())
-        );
+        const reqL        = requiredEdu.toLowerCase();
+        const reqKeywords = extractFieldKeywords(requiredEdu);
+        const hasEdu = candidate.education.some(e => {
+          const dl = (e.degree || "").toLowerCase();
+          if (dl.includes(reqL) || reqL.includes(dl)) return true;
+          if (cEduTier >= lEduTier && lEduTier > 0) {
+            const ck = extractFieldKeywords(e.degree || "");
+            return reqKeywords.some(rk => ck.some(c => c.includes(rk) || rk.includes(c)));
+          }
+          return false;
+        });
         if (!hasEdu) return null;
       }
 
@@ -335,23 +355,37 @@
         const jt = listing.job_title.toLowerCase();
         if (candidate.experience.some(e => (e.job_title || "").toLowerCase().split(/\s+/).some(w => w.length > 2 && jt.includes(w)))) score += 5;
       }
+
       if (requiredEdu) {
-        if (candidate.education.some(e => (e.degree || "").toLowerCase().includes(requiredEdu) || requiredEdu.includes((e.degree || "").toLowerCase()))) score += 4;
+        const reqL        = requiredEdu.toLowerCase();
+        const reqKeywords = extractFieldKeywords(requiredEdu);
+        const hasMatch = candidate.education.some(e => {
+          const dl = (e.degree || "").toLowerCase();
+          if (dl.includes(reqL) || reqL.includes(dl)) return true;
+          if (cEduTier >= lEduTier && lEduTier > 0) {
+            const ck = extractFieldKeywords(e.degree || "");
+            return reqKeywords.some(rk => ck.some(c => c.includes(rk) || rk.includes(c)));
+          }
+          return false;
+        });
+        if (hasMatch) score += 4;
       }
-      const cEduTier = candidate.education.length > 0 ? Math.max(...candidate.education.map(e => eduTier(e.level))) : 0;
-      const lEduTier = eduTier(listing.required_education);
+
       if (lEduTier === 0) score += 3; else if (cEduTier >= lEduTier) score += 3;
       if (requiredYears === 0 || candidateYears >= requiredYears) score += 3;
+
       if (candidate.preferred_location && listing.job_location) {
         const cl = candidate.preferred_location.toLowerCase(), jl = listing.job_location.toLowerCase();
         if (cl.includes(jl) || jl.includes(cl)) score += 2;
       }
       if (candidate.working_mode && listing.work_mode && candidate.working_mode.toLowerCase() === listing.work_mode.toLowerCase()) score += 2;
+
       const ls = (listing.required_skills || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
       if (candidate.skills.length > 0 && ls.length > 0) {
         const cs = candidate.skills.map(s => s.toLowerCase());
         if (ls.some(l => cs.some(c => c.includes(l) || l.includes(c)))) score += 1;
       }
+
       return score;
     }
 
